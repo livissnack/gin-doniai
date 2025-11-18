@@ -1,0 +1,12 @@
+{{template "base" .}}
+{{define "title"}}关于我们{{end}}
+
+{{define "content"}}
+<h1>关于我们</h1>
+<p>这是关于页面内容</p>
+<ul>
+    {{range .TeamMembers}}
+    <li>{{.Name}} - {{.Role}}</li>
+    {{end}}
+</ul>
+{{end}}

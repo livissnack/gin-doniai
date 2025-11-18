@@ -1,0 +1,52 @@
+{{define "header"}}
+<header>
+  <div class="container">
+    <div class="navbar">
+      <a href="/" class="logo">Doniai</a>
+
+      <div class="nav-links">
+        <a href="/">首页</a>
+        <a href="#">节点</a>
+        <a href="#">热门</a>
+        <a href="#">标签</a>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" placeholder="搜索内容...">
+        <button>搜索</button>
+      </div>
+
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" title="切换主题">
+          <span class="theme-icon">🌙</span>
+        </button>
+
+        <div class="user-actions">
+          {{if .user}}
+          <!-- 用户已登录状态 -->
+          <div class="user-dropdown">
+            <div class="user-info" id="userDropdown">
+              <img src="{{.user.Avatar}}" alt="{{.user.Name}}" class="user-avatar">
+              <span class="username">{{.user.Name}}</span>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+              <a href="/profile">个人资料</a>
+              <a href="/settings">设置</a>
+              <a href="/logout">退出登录</a>
+            </div>
+          </div>
+          {{else if eq .CurrentPath "/login"}}
+          <a href="/" class="btn btn-primary">回到首页</a>
+          {{else if eq .CurrentPath "/register"}}
+          <a href="/" class="btn btn-outline">回到首页</a>
+          {{else}}
+          <a href="/login" class="btn btn-outline">登录</a>
+          <a href="/register" class="btn btn-primary">注册</a>
+          {{end}}
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+{{end}}
