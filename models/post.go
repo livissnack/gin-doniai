@@ -17,6 +17,7 @@ type Post struct {
     Replies   int            `json:"replies" gorm:"default:0"`    // 回复数
     Favorites int            `json:"favorites" gorm:"default:0"`  // 收藏数
     Likes     int            `json:"likes" gorm:"default:0"`      // 点赞数
+    ReadLimit int            `json:"read_limit" gorm:"default:1"` // 阅读限制: 1-公开, 2-Lv1, 3-Lv2, 4-私有
     CreatedAt time.Time      `json:"created_at"`
     UpdatedAt time.Time      `json:"updated_at"`
     DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`

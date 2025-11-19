@@ -18,8 +18,40 @@ import (
     "github.com/gin-contrib/sessions/cookie"
 )
 
+// 在 main.go 顶部添加全局变量
+var (
+    globalConfig GlobalConfig
+    recommendedCategories []models.Category
+)
+
+// 修改 GlobalConfig 结构体，添加 Categories 字段
+type GlobalConfig struct {
+    SiteName string
+    Theme    string
+    Version  string
+    Categories []models.Category // 添加推荐分类字段
+}
+
+
+
 func main() {
 	database.InitDB()
+
+    // 初始化全局配置
+    globalConfig = GlobalConfig{
+        SiteName: "Doniai",
+        Theme:    "light",
+        Version:  "1.0.0",
+    }
+
+    // 获取推荐分类并注入到全局配置
+    if categories, err := handlers.GetRecommendedCategories(); err == nil {
+        recommendedCategories = categories
+        globalConfig.Categories = categories
+    } else {
+        fmt.Printf("获取推荐分类失败: %v\n", err)
+    }
+
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 	router.SetFuncMap(template.FuncMap{
@@ -36,6 +68,10 @@ func main() {
     		}
     		return result
     	},
+        // 添加获取全局配置的函数
+        "global": func() GlobalConfig {
+            return globalConfig
+        },
     })
     // 设置session存储
     store := cookie.NewStore([]byte("secret"))

@@ -2,13 +2,12 @@
 <header>
   <div class="container">
     <div class="navbar">
-      <a href="/" class="logo">Doniai</a>
+      <a href="/" class="logo">{{(global).SiteName}}</a>
 
       <div class="nav-links">
-        <a href="/">首页</a>
-        <a href="#">节点</a>
-        <a href="#">热门</a>
-        <a href="#">标签</a>
+        {{range (global).Categories}}
+        <a href="/categories/{{.Alias}}">{{.Name}}</a>
+        {{end}}
       </div>
 
       <div class="search-bar">
