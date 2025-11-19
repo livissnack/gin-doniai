@@ -42,6 +42,8 @@ func main() {
     router.Use(sessions.Sessions("mysession", store))
     // 在路由定义之前应用用户中间件
     router.Use(UserMiddleware())
+    router.Use(OnlineStatusMiddleware())
+
 	// 加载模板文件
 	router.LoadHTMLGlob("templates/**/*")
 
@@ -60,6 +62,10 @@ func main() {
     router.GET("/profile", profileHandler)
     router.GET("/publish", publishHandler)
     router.GET("/settings", settingsHandler)
+
+    // 在 main.go 的路由部分添加
+    router.GET("/api/online/count", handlers.GetOnlineUserCount)
+
 
     // 在 main.go 的路由定义部分添加评论路由
     commentRoutes := router.Group("/api/comments")
@@ -94,6 +100,19 @@ func main() {
 		postRoutes.POST("/:id/favorite", handlers.FavoritePost)   // 文章收藏
 	}
 
+    // 启动定时清理任务
+    go func() {
+        ticker := time.NewTicker(10 * time.Minute) // 每10分钟清理一次
+        defer ticker.Stop()
+
+        for {
+            select {
+            case <-ticker.C:
+                handlers.CleanupExpiredOnlineStatus()
+            }
+        }
+    }()
+
 	router.Run(":8080")
 }
 
@@ -117,6 +136,20 @@ func UserMiddleware() gin.HandlerFunc {
         c.Next()
     }
 }
+
+// OnlineStatusMiddleware 在线状态中间件
+func OnlineStatusMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        // 处理请求前更新在线状态
+        handlers.UpdateUserOnlineStatus(c)
+
+        c.Next()
+
+        // 请求处理后也可以选择再次更新
+        // UpdateUserOnlineStatus(c)
+    }
+}
+
 
 
 
@@ -187,6 +220,13 @@ func homeHandler(c *gin.Context) {
 		})
 	}
 
+    // 获取在线用户数
+    var onlineCount int64
+    cutoffTime := time.Now().Add(-30 * time.Minute)
+    database.DB.Model(&models.UserOnlineStatus{}).
+        Where("last_active_time > ?", cutoffTime).
+        Count(&onlineCount)
+
 	data := gin.H{
 		"CurrentTime": time.Now().Format("2006-01-02 15:04:05"),
 		"posts":       postsWithTimeAgo,
@@ -197,6 +237,7 @@ func homeHandler(c *gin.Context) {
 		"prevPage":    page - 1,
 		"nextPage":    page + 1,
 		"user":        user, // 添加用户信息
+		"onlineCount": onlineCount, // 添加在线用户数
 	}
 
 	c.HTML(http.StatusOK, "home.tmpl", data)

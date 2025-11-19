@@ -58,6 +58,7 @@ func initDB() {
 	DB.AutoMigrate(&models.Category{})
 	DB.AutoMigrate(&models.PostLike{})
 	DB.AutoMigrate(&models.PostFavorite{})
+	DB.AutoMigrate(&models.UserOnlineStatus{})
 	log.Println("数据库连接成功")
 }
 
