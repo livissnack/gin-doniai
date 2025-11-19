@@ -1783,3 +1783,172 @@ footer a:hover {
   align-items: center;
   margin-top: 0;
 }
+
+/* Post body content styling with shadcn style */
+.post-body {
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+/* Headings */
+.post-body h1,
+.post-body h2,
+.post-body h3,
+.post-body h4,
+.post-body h5,
+.post-body h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.post-body h1 {
+  font-size: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.post-body h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.post-body h3 {
+  font-size: 1.25rem;
+}
+
+.post-body h4 {
+  font-size: 1.1rem;
+}
+
+.post-body h5,
+.post-body h6 {
+  font-size: 1rem;
+}
+
+/* Paragraphs */
+.post-body p {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+/* Lists */
+.post-body ul,
+.post-body ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.post-body ul {
+  list-style-type: disc;
+}
+
+.post-body ol {
+  list-style-type: decimal;
+}
+
+.post-body li {
+  margin-bottom: 0.25rem;
+}
+
+.post-body li > ul,
+.post-body li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+/* Strong/Bold text */
+.post-body strong {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* Inline code */
+.post-body code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  background-color: var(--bg-sub-color);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+/* Code blocks */
+.post-body pre {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: var(--bg-sub-color);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+}
+
+.post-body pre > code {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  font-size: 0.875rem;
+  color: var(--editor-text-color);
+}
+
+/* Tables */
+.post-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--table-bg);
+}
+
+.post-body table th,
+.post-body table td {
+  padding: 0.2rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.post-body table th {
+  min-width: 80px;
+  background-color: var(--table-header-bg);
+  font-weight: 600;
+  color: var(--table-header-text);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.post-body table tr:last-child td {
+  border-bottom: none;
+}
+
+.post-body table tr:hover td {
+  background-color: var(--table-hover-bg);
+}
+
+/* Blockquotes */
+.post-body blockquote {
+  margin: 1.5rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid var(--primary-color);
+  background-color: var(--bg-sub-color);
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.post-body blockquote p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Links */
+.post-body a {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.post-body a:hover {
+  color: var(--primary-hover);
+}
