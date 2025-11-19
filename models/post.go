@@ -11,6 +11,7 @@ type Post struct {
     UserId    int            `json:"user_id" gorm:"not null"`
     Author    string         `json:"author" gorm:"size:40;not null"`
     Category  string         `json:"category" gorm:"size:100;not null"`
+    CategoryId int           `json:"category_id" gorm:"default:0"`
     Content   string         `json:"content" gorm:"type:text;not null"`
     Tags      string         `json:"tags" gorm:"size:255;not null"`
     Views     int            `json:"views" gorm:"default:0"`      // 浏览数

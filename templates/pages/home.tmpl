@@ -89,16 +89,9 @@
            </div>
 
            <div class="node-list">
-             <a href="#" class="node-tag">VPS</a>
-             <a href="#" class="node-tag">Linux</a>
-             <a href="#" class="node-tag">Docker</a>
-             <a href="#" class="node-tag">Node.js</a>
-             <a href="#" class="node-tag">Python</a>
-             <a href="#" class="node-tag">数据库</a>
-             <a href="#" class="node-tag">CDN</a>
-             <a href="#" class="node-tag">网络安全</a>
-             <a href="#" class="node-tag">云计算</a>
-             <a href="#" class="node-tag">前端开发</a>
+             {{range .categories}}
+             <a href="/categories/{{.Alias}}" class="node-tag">{{.Name}}</a>
+             {{end}}
            </div>
          </div>
        </div>
@@ -121,9 +114,9 @@
              <div class="card-title">社区统计</div>
            </div>
            <div class="stats">
-             <div class="stat-item">注册用户: 15,284</div>
-             <div class="stat-item">主题数量: 8,742</div>
-             <div class="stat-item">回复数量: 42,156</div>
+             <div class="stat-item">注册用户: {{.userCount}}</div>
+             <div class="stat-item">主题数量: {{.postCount}}</div>
+             <div class="stat-item">回复数量: {{.commentCount}}</div>
              <div class="stat-item">在线用户: {{.onlineCount}}</div>
            </div>
          </div>

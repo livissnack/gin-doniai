@@ -22,23 +22,11 @@
 
         <form class="publish-form" id="publishForm">
             <div class="publish-form-group">
-                <label for="title">文章标题</label>
-                <input type="text" id="title" name="title" placeholder="请输入文章标题" required class="form-control">
+                <label for="title">标题</label>
+                <input type="text" id="title" name="title" placeholder="请输入标题" required class="form-control">
             </div>
 
-            <div class="form-row">
-                <div class="publish-form-group">
-                    <label for="category">文章分类</label>
-                    <select id="category" name="category" class="form-control">
-                        <option value="">请选择分类</option>
-                        <option value="技术分享">技术分享</option>
-                        <option value="问题求助">问题求助</option>
-                        <option value="经验总结">经验总结</option>
-                        <option value="资源推荐">资源推荐</option>
-                        <option value="随笔杂谈">随笔杂谈</option>
-                    </select>
-                </div>
-
+            <div class="form-row publish-form-tags">
                 <div class="publish-form-group">
                     <label for="tagInput">标签</label>
                     <div class="tag-input-wrapper">
@@ -162,13 +150,31 @@
                     </div>
 
                     <div class="topic-select">
+                        <div class="topic-contain-select">
+                            <div class="topic-form-group">
+                                <label>板块</label>
+                                <select name="category" class="form-control">
+                                    {{range .categories}}
+                                    <option value="{{.ID}}">{{.Name}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
 
+                            <div class="topic-form-group">
+                                <label>阅读限制</label>
+                                <select name="readLimit" class="form-control">
+                                    <option value="1">公开</option>
+                                    <option value="2">Lv1</option>
+                                    <option value="3">Lv2</option>
+                                    <option value="4">私有</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="publish-actions">
+                            <button type="submit" class="btn btn-primary">发布文章</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="publish-actions">
-                <button type="submit" class="btn btn-primary">发布文章</button>
             </div>
         </form>
     </div>

@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function (index) {
     const tabOptions = document.querySelectorAll('.tab-option');
     const editorPane = document.getElementById('editorPane');
     const editorWrapper = document.querySelector('.editor-wrapper');
-    let htmlContent = ''
 
 
     // 后续再添加事件监听器
@@ -52,16 +51,20 @@ document.addEventListener('DOMContentLoaded', function (index) {
     publishForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        // 获取编辑器内容
-        const markdownContent = editor.getValue();
-        // const htmlContent = renderMarkdownToHtml(markdownContent);
+        // 获取表单数据
+        const title = document.getElementById('title').value;
+        const tags = document.getElementById('tags').value; // 隐藏字段，包含所有标签
+        const content = editor.getValue(); // CodeMirror编辑器内容
+        const htmlContent = marked.parse(content)
+        const category = document.querySelector('select[name="category"]').value;
+        const readLimit = document.querySelector('select[name="readLimit"]').value;
 
-        const formData = new FormData(this);
         const data = {
-            title: formData.get('title'),
-            category: formData.get('category'),
-            tags: tags.join(','),
-            content: htmlContent
+            title: title,
+            tags: tags,
+            content: htmlContent,
+            category_id: parseInt(category),
+            read_limit: parseInt(readLimit)
         };
 
         // 发送到后端
@@ -332,13 +335,13 @@ document.addEventListener('DOMContentLoaded', function (index) {
                     case 0: // 内容
                         editorPane.style.display = 'block';
                         previewPane.style.display = 'none';
-                        editorWrapper.style.height = '300px';
+                        editorWrapper.style.height = '380px';
                         editorPane.style.width = '100%';
                         break;
                     case 1: // 预览
                         editorPane.style.display = 'none';
                         previewPane.style.display = 'block';
-                        editorWrapper.style.height = '300px';
+                        editorWrapper.style.height = '380px';
                         previewPane.style.width = '100%';
                         previewPane.style.padding = '10px';
                         updatePreview();
@@ -346,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function (index) {
                     case 2: // 对照
                         editorPane.style.display = 'block';
                         previewPane.style.display = 'block';
-                        editorWrapper.style.height = '300px';
+                        editorWrapper.style.height = '380px';
                         // 重置浮动样式
                         editorPane.style.cssFloat = 'left';
                         editorPane.style.width = '50%';
@@ -415,5 +418,63 @@ document.addEventListener('DOMContentLoaded', function (index) {
 });
 
 
+document.addEventListener('DOMContentLoaded', function() {
+    const tagInput = document.getElementById('tagInput');
+    const addTagBtn = document.getElementById('addTagBtn');
+    const tagList = document.getElementById('tagList');
+    const tagsHiddenInput = document.getElementById('tags');
 
+    let tags = [];
+
+    tagInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(tagInput.value.trim());
+        }
+    });
+
+    addTagBtn.addEventListener('click', function() {
+        addTag(tagInput.value.trim());
+    });
+
+    function addTag(tagText) {
+        if (tagText && !tags.includes(tagText)) {
+            tags.push(tagText);
+
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tagText}
+                <span class="tag-remove" data-tag="${tagText}">&times;</span>
+            `;
+
+            tagList.appendChild(tagElement);
+
+            updateTagsInput();
+
+            tagInput.value = '';
+
+            tagElement.querySelector('.tag-remove').addEventListener('click', function() {
+                removeTag(tagText);
+            });
+        }
+    }
+
+    function removeTag(tagText) {
+        tags = tags.filter(tag => tag !== tagText);
+
+        const tagElements = tagList.querySelectorAll('.tag-item');
+        tagElements.forEach(element => {
+            if (element.textContent.includes(tagText)) {
+                element.remove();
+            }
+        });
+
+        updateTagsInput();
+    }
+
+    function updateTagsInput() {
+        tagsHiddenInput.value = JSON.stringify(tags);
+    }
+});
 
