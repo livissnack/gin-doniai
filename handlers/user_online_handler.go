@@ -81,3 +81,25 @@ func CleanupExpiredOnlineStatus() {
 	database.DB.Where("last_active_time < ?", cutoffTime).
 		Delete(&models.UserOnlineStatus{})
 }
+
+// UpdateUserOnlineStatusWithInfo 更新用户在线状态（用于消息队列处理）
+func UpdateUserOnlineStatusWithInfo(userID uint, clientIP string, userAgent string) {
+    // 获取session（注意：在批量处理中可能需要不同的session处理方式）
+    // 这里我们简化处理，只使用必要的信息
+
+    // 获取当前时间
+    currentTime := time.Now()
+
+    // 创建在线状态记录
+    onlineStatus := models.UserOnlineStatus{
+        UserID:         userID,
+        LastActiveTime: currentTime,
+        IPAddress:      clientIP,
+        SessionID:      fmt.Sprintf("batch-%d-%s", userID, currentTime.Format("20060102150405")),
+        UserAgent:      userAgent,
+    }
+
+    // 使用Upsert操作更新在线状态
+    database.DB.Where("user_id = ?", userID).Assign(onlineStatus).FirstOrCreate(&onlineStatus)
+}
+

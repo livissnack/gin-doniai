@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"gin-doniai/models"
 
@@ -50,6 +51,12 @@ func initDB() {
 	if dbErr != nil {
 		log.Fatal("数据库连接失败:", dbErr)
 	}
+
+	// 配置连接池
+	sqlDB, _ := DB.DB()
+	sqlDB.SetMaxIdleConns(10)                // 空闲连接数
+	sqlDB.SetMaxOpenConns(100)               // 最大连接数
+	sqlDB.SetConnMaxLifetime(time.Hour)      // 连接最大存活时间
 
 	// 自动迁移（创建表）
 	DB.AutoMigrate(&models.User{})
