@@ -1,5 +1,5 @@
 # Dockerfile
-FROM golang:1.19-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -9,18 +9,16 @@ COPY go.mod go.sum ./
 
 # 下载依赖
 RUN go mod download
+RUN go mod verify
 
 # 复制源代码
 COPY . .
 
-# 构建应用
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# 构建应用（优化构建命令，移除-a标志以利用缓存）
+RUN CGO_ENABLED=0 GOOS=linux go build -installsuffix cgo -ldflags="-s -w" -o main .
 
 # 使用更小的基础镜像
 FROM alpine:latest
-
-# 安装ca证书（用于HTTPS请求）
-RUN apk --no-cache add ca-certificates
 
 # 创建工作目录
 WORKDIR /root/
