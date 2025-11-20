@@ -36,7 +36,7 @@ func initDB() {
 	}
 
 	// 从环境变量获取数据库配置
-	username := os.Getenv("DB_USERNAME")
+	username := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
