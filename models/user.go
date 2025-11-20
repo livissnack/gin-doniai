@@ -12,6 +12,7 @@ type User struct {
     Password  string         `json:"password" gorm:"size:255;not null"`
     Avatar    string         `json:"avatar" gorm:"size:255;not null"`
     Age       int            `json:"age" gorm:"default:0"`
+    Level     int            `json:"level" gorm:"default:1"`
     AgreeTerms bool          `json:"agree_terms" gorm:"default:false"` // 修改为布尔类型
     CreatedAt time.Time      `json:"created_at"`
     UpdatedAt time.Time      `json:"updated_at"`

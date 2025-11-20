@@ -12,46 +12,53 @@ import (
 )
 
 // UpdateUserOnlineStatus 更新用户在线状态
-// UpdateUserOnlineStatus 更新用户在线状态
 func UpdateUserOnlineStatus(c *gin.Context) {
-	// 从上下文获取用户信息
-	userObj, exists := c.Get("user")
-	if !exists || userObj == nil {
-		return // 未登录用户不处理
-	}
-	user := userObj.(*models.User)
+    // 从上下文获取用户信息
+    userObj, exists := c.Get("user")
+    if !exists || userObj == nil {
+        return // 未登录用户不处理
+    }
 
-	// 获取session
-	session := sessions.Default(c)
+    // 安全地进行类型断言
+    user, ok := userObj.(*models.User)
+    // 增强检查确保 user 对象不为 nil
+    if !ok || user == nil || user.ID == 0 {
+        return // 用户信息无效时不处理
+    }
 
-	// 正确获取session ID的方式
-	var sessionID string
-	if sessionIDInterface := session.Get("session_id"); sessionIDInterface != nil {
-		sessionID = sessionIDInterface.(string)
-	} else {
-		// 如果没有存储的session_id，则使用session的ID
-		sessionID = fmt.Sprintf("%v", session.ID())
-		// 可选：将session ID存储到session中供后续使用
-		session.Set("session_id", sessionID)
-		session.Save()
-	}
+    // 获取session
+    session := sessions.Default(c)
 
-	// 获取客户端IP和User-Agent
-	clientIP := c.ClientIP()
-	userAgent := c.GetHeader("User-Agent")
+    // 正确获取session ID的方式
+    var sessionID string
+    if sessionIDInterface := session.Get("session_id"); sessionIDInterface != nil {
+        sessionID = sessionIDInterface.(string)
+    } else {
+        // 如果没有存储的session_id，则使用session的ID
+        sessionID = fmt.Sprintf("%v", session.ID())
+        // 可选：将session ID存储到session中供后续使用
+        session.Set("session_id", sessionID)
+        session.Save()
+    }
 
-	// 更新或创建在线状态记录
-	onlineStatus := models.UserOnlineStatus{
-		UserID:         user.ID,
-		LastActiveTime: time.Now(),
-		SessionID:      sessionID,
-		IPAddress:      clientIP,
-		UserAgent:      userAgent,
-	}
+    // 获取客户端IP和User-Agent
+    clientIP := c.ClientIP()
+    userAgent := c.GetHeader("User-Agent")
 
-	// 使用Upsert操作更新在线状态
-	database.DB.Where("user_id = ?", user.ID).Assign(onlineStatus).FirstOrCreate(&onlineStatus)
+    // 更新或创建在线状态记录
+    onlineStatus := models.UserOnlineStatus{
+        UserID:         user.ID,
+        LastActiveTime: time.Now(),
+        SessionID:      sessionID,
+        IPAddress:      clientIP,
+        UserAgent:      userAgent,
+    }
+
+    // 使用Upsert操作更新在线状态
+    database.DB.Where("user_id = ?", user.ID).Assign(onlineStatus).FirstOrCreate(&onlineStatus)
 }
+
+
 
 // GetOnlineUserCount 获取在线用户数
 func GetOnlineUserCount(c *gin.Context) {

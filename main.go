@@ -97,6 +97,10 @@ func main() {
 	router.GET("/profile", profileHandler)
 	router.GET("/publish", publishHandler)
 	router.GET("/settings", settingsHandler)
+	// 添加搜索路由
+    router.GET("/search", searchPostsHandler)
+    router.GET("/member", searchUsersHandler)
+
 
 	// 在 main.go 的路由部分添加
 	router.GET("/api/online/count", handlers.GetOnlineUserCount)
@@ -152,24 +156,35 @@ func main() {
 
 // UserMiddleware 全局获取用户信息的中间件
 func UserMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		userID := session.Get("user_id")
+    return func(c *gin.Context) {
+        session := sessions.Default(c)
+        userID := session.Get("user_id")
 
-		var user *models.User
-		if userID != nil {
-			var currentUser models.User
-			if err := database.DB.First(&currentUser, userID).Error; err == nil {
-				user = &currentUser
-			}
-		} else {
-			fmt.Println("Middleware - Session中没有user_id")
-		}
+        var user *models.User
+        if userID != nil {
+            // 确保 userID 是有效的数字类型
+            if userIDVal, ok := userID.(uint); ok && userIDVal > 0 {
+                var currentUser models.User
+                if err := database.DB.First(&currentUser, userIDVal).Error; err == nil {
+                    user = &currentUser
+                }
+            } else if userIDVal, ok := userID.(int); ok && userIDVal > 0 {
+                var currentUser models.User
+                if err := database.DB.First(&currentUser, uint(userIDVal)).Error; err == nil {
+                    user = &currentUser
+                }
+            }
+        } else {
+            // 当没有user_id时，不进行重定向以避免循环重定向
+            // 只是简单地设置user为nil
+            fmt.Println("Middleware - Session中没有user_id")
+        }
 
-		c.Set("user", user)
-		c.Next()
-	}
+        c.Set("user", user)
+        c.Next()
+    }
 }
+
 
 // OnlineStatusMiddleware 在线状态中间件
 func OnlineStatusMiddleware() gin.HandlerFunc {
@@ -178,9 +193,6 @@ func OnlineStatusMiddleware() gin.HandlerFunc {
 		handlers.UpdateUserOnlineStatus(c)
 
 		c.Next()
-
-		// 请求处理后也可以选择再次更新
-		// UpdateUserOnlineStatus(c)
 	}
 }
 
@@ -417,9 +429,9 @@ func detailHandler(c *gin.Context) {
 	tags := utils.ParseTags(post.Tags)
 	// 将文章详情数据和用户信息传递给模板
 	var postCount, replyCount, likeCount int64
-	database.DB.Model(&models.Post{}).Where("user_id = ?", user.ID).Count(&postCount)
-	database.DB.Model(&models.Post{}).Where("user_id = ?", user.ID).Select("SUM(replies)").Row().Scan(&replyCount)
-	database.DB.Model(&models.Post{}).Where("user_id = ?", user.ID).Select("SUM(likes)").Row().Scan(&likeCount)
+    database.DB.Model(&models.Post{}).Where("user_id = ?", post.User.ID).Count(&postCount)
+    database.DB.Model(&models.Post{}).Where("user_id = ?", post.User.ID).Select("SUM(replies)").Row().Scan(&replyCount)
+    database.DB.Model(&models.Post{}).Where("user_id = ?", post.User.ID).Select("SUM(likes)").Row().Scan(&likeCount)
 	// 将评论分页信息添加到模板数据
 	data := gin.H{
 		"Post":               post,
@@ -705,4 +717,176 @@ func registerSubmit(c *gin.Context) {
 			"email":   newUser.Email,
 		},
 	})
+}
+
+func searchPostsHandler(c *gin.Context) {
+    // 从上下文获取用户信息
+	userObj, exists := c.Get("user")
+	var user *models.User
+	if exists && userObj != nil {
+		user = userObj.(*models.User)
+	} else {
+		fmt.Println("未获取到用户信息")
+	}
+	// 获取页码参数，默认为第1页
+	pageStr := c.Query("page")
+	// 获取路由categories/:type中type参数
+	qStr := c.Query("q")
+	page := 1
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	// 每页显示的帖子数量
+	limit := 10
+	offset := (page - 1) * limit
+
+	// 查询总记录数
+	var total int64
+	database.DB.Model(&models.Post{}).Count(&total)
+
+	// 查询当前页的帖子
+	var posts []models.Post
+	postQuery := database.DB.Order("created_at DESC").Offset(offset).Limit(limit)
+
+
+	// 修改查询条件为模糊搜索
+    postQuery = postQuery.Where("title LIKE ?", "%"+qStr+"%")
+
+
+	postQuery.Find(&posts)
+
+	// 计算总页数
+	totalPages := int((total + int64(limit) - 1) / int64(limit))
+
+	// 创建带有友好时间的帖子结构
+	type PostWithFriendlyTime struct {
+		models.Post
+		TimeAgo string
+	}
+
+	var postsWithTimeAgo []PostWithFriendlyTime
+	for _, post := range posts {
+		timeAgo := utils.GetTimeAgo(post.CreatedAt)
+		postsWithTimeAgo = append(postsWithTimeAgo, PostWithFriendlyTime{
+			Post:    post,
+			TimeAgo: timeAgo,
+		})
+	}
+
+	// 获取在线用户数
+	var onlineCount int64
+	cutoffTime := time.Now().Add(-30 * time.Minute)
+	database.DB.Model(&models.UserOnlineStatus{}).
+		Where("last_active_time > ?", cutoffTime).
+		Count(&onlineCount)
+
+	// 获取站点统计信息
+	var userCount, postCount, commentCount int64
+	database.DB.Model(&models.User{}).Count(&userCount)
+	database.DB.Model(&models.Post{}).Count(&postCount)
+	database.DB.Model(&models.Comment{}).Count(&commentCount)
+
+	// 获取所有分类
+	var categories []models.Category
+	database.DB.Where("status_code = ?", 1).Find(&categories)
+
+	// 1、统计注册用户
+	// 2、统计文章数量
+	// 3、统计回复评论数量
+	// 4、数据表categories查询所有分类
+
+	data := gin.H{
+		"CurrentTime":  time.Now().Format("2006-01-02 15:04:05"),
+		"posts":        postsWithTimeAgo,
+		"currentPage":  page,
+		"totalPages":   totalPages,
+		"hasPrev":      page > 1,
+		"hasNext":      page < totalPages,
+		"prevPage":     page - 1,
+		"nextPage":     page + 1,
+		"user":         user,
+		"userCount":    userCount,
+		"postCount":    postCount,
+		"commentCount": commentCount,
+		"onlineCount":  onlineCount,
+		"categories":   categories,
+	}
+
+	c.HTML(http.StatusOK, "search.tmpl", data)
+}
+
+func searchUsersHandler(c *gin.Context) {
+    // 从上下文获取用户信息
+    userObj, exists := c.Get("user")
+    var user *models.User
+    if exists && userObj != nil {
+        user = userObj.(*models.User)
+    } else {
+        fmt.Println("未获取到用户信息")
+    }
+
+    // 获取页码参数和搜索关键字
+    pageStr := c.Query("page")
+    qStr := c.Query("q")
+    page := 1
+    if pageStr != "" {
+        if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+            page = p
+        }
+    }
+
+    // 每页显示的用户数量
+    limit := 10
+    offset := (page - 1) * limit
+
+    // 查询总记录数
+    var total int64
+    dbQuery := database.DB.Model(&models.User{})
+    if qStr != "" {
+        dbQuery = dbQuery.Where("name LIKE ? OR email LIKE ?", "%"+qStr+"%", "%"+qStr+"%")
+    }
+    dbQuery.Count(&total)
+
+    // 查询当前页的用户
+    var users []models.User
+    userQuery := database.DB.Order("created_at DESC").Offset(offset).Limit(limit)
+    if qStr != "" {
+        userQuery = userQuery.Where("name LIKE ? OR email LIKE ?", "%"+qStr+"%", "%"+qStr+"%")
+    }
+    userQuery.Find(&users)
+
+    // 计算总页数
+    totalPages := int((total + int64(limit) - 1) / int64(limit))
+
+    // 创建带有友好时间的用户结构
+    type UserWithFriendlyTime struct {
+        models.User
+        TimeAgo string
+    }
+
+    var usersWithTimeAgo []UserWithFriendlyTime
+    for _, user := range users {
+        timeAgo := utils.GetTimeAgo(user.CreatedAt)
+        usersWithTimeAgo = append(usersWithTimeAgo, UserWithFriendlyTime{
+            User:    user,
+            TimeAgo: timeAgo,
+        })
+    }
+
+    data := gin.H{
+        "users":        usersWithTimeAgo,
+        "currentPage":  page,
+        "totalPages":   totalPages,
+        "hasPrev":      page > 1,
+        "hasNext":      page < totalPages,
+        "prevPage":     page - 1,
+        "nextPage":     page + 1,
+        "user":         user,
+        "searchKeyword": qStr,
+    }
+
+    c.HTML(http.StatusOK, "member.tmpl", data)
 }

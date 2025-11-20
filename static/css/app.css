@@ -157,30 +157,62 @@ header {
 
 
 .search-bar {
+  position: relative;
   display: flex;
-  margin: 0 20px;
-  flex-grow: 1;
-  max-width: 400px;
+  align-items: center;
 }
 
 .search-bar input {
-  width: 100%;
   padding: 8px 12px;
-  background-color: var(--bg-sub-color);
-  border: 1px solid var(--border-color);
+  border: 1px solid #ddd;
   border-radius: 4px 0 0 4px;
-  color: var(--text-color);
+  width: 200px;
 }
 
 .search-bar button {
-  background-color: var(--primary-color);
-  border: none;
+  padding: 7px 12px;
+  background-color: #007bff;
   color: white;
-  padding: 8px 15px;
+  border: 1px solid #007bff;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
-  min-width: 60px;
 }
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: var(--bg-sub-color);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+  font-size: 12px;
+}
+
+.search-option {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.search-option:hover {
+  background-color: var(--hover-color);
+}
+
+.search-option:last-child {
+  border-bottom: none;
+}
+
+.search-option.selected {
+  color: #4CAF50;
+}
+
+.search-option {
+  transition: color 0.2s ease;
+}
+
 
 .user-actions {
   display: flex;
@@ -974,7 +1006,7 @@ footer a:hover {
   margin-top: 1rem;
   display: flex;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
   background: #f8f9fa;
   border-radius: 8px;
   margin-bottom: 2rem;
@@ -985,10 +1017,10 @@ footer a:hover {
 }
 
 .profile-avatar .avatar-img {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-right: 2rem;
+  margin-right: 1rem;
 }
 
 .profile-info h1 {
@@ -1041,8 +1073,16 @@ footer a:hover {
   padding-bottom: 0;
 }
 
+.settings-header {
+  border-radius: 6px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  background-color: var(--card-bg);
+  padding: 15px 15px 15px 15px;
+}
+
 .settings-header h1 {
-  margin-bottom: 2rem;
+  /*margin-bottom: 2rem;*/
   color: #333;
 }
 
@@ -1320,7 +1360,6 @@ footer a:hover {
 }
 
 .btn {
-  padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
@@ -1951,4 +1990,115 @@ footer a:hover {
 
 .post-body a:hover {
   color: var(--primary-hover);
+}
+
+/* 为member.tmpl页面添加作用域限定 */
+.member-page .user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.member-page .user-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s ease;
+}
+
+.member-page .user-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.member-page .user-avatar .avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 15px;
+  border: 2px solid var(--border-color);
+}
+
+.member-page .user-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: var(--text-color);
+}
+
+.member-page .join-time {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0 0 15px 0;
+}
+
+.member-page .user-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.member-page .stat-item {
+  font-size: 14px;
+}
+
+.member-page .stat-label {
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.member-page .stat-value {
+  font-weight: 600;
+  color: var(--text-color);
+  display: block;
+}
+
+.member-page .user-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.member-page .btn-follow,
+.member-page .btn-message {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.member-page .btn-follow {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.member-page .btn-follow:hover {
+  background-color: var(--primary-hover);
+}
+
+.member-page .btn-message {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.member-page .btn-message:hover {
+  background-color: #218838;
+}
+
+.member-page .no-users {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
 }

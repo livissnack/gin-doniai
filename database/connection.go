@@ -53,9 +53,9 @@ func initDB() {
 
 	// 自动迁移（创建表）
 	DB.AutoMigrate(&models.User{})
+    DB.AutoMigrate(&models.Category{})
 	DB.AutoMigrate(&models.Post{})
 	DB.AutoMigrate(&models.Comment{})
-	DB.AutoMigrate(&models.Category{})
 	DB.AutoMigrate(&models.PostLike{})
 	DB.AutoMigrate(&models.PostFavorite{})
 	DB.AutoMigrate(&models.UserOnlineStatus{})

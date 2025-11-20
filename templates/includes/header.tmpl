@@ -10,9 +10,15 @@
         {{end}}
       </div>
 
-      <div class="search-bar">
-        <input type="text" placeholder="搜索内容...">
-        <button>搜索</button>
+      <div class="search-bar" id="searchBar">
+        <input type="text" placeholder="搜索内容..." id="searchInput">
+        <button id="searchButton">搜索</button>
+        <!-- 添加下拉菜单 -->
+        <div class="search-dropdown" id="searchDropdown" style="display: none;">
+          <div class="search-option" data-type="posts">搜索帖子：<span class="search-keyword"></span></div>
+          <div class="search-option" data-type="users">搜索用户：<span class="search-keyword"></span></div>
+          <div class="search-option" data-type="google">谷歌搜索：<span class="search-keyword"></span></div>
+        </div>
       </div>
 
       <div class="header-actions">

@@ -50,6 +50,14 @@
                         <label>个人格言:</label>
                         <span>{{if .profileUser.Motto}}{{.profileUser.Motto}}{{else}}暂未设置{{end}}</span>
                     </div>
+                    <div class="profile-field">
+                        <label>GitHub 账号:</label>
+                        <span>{{if .profileUser.Github}}{{.profileUser.Github}}{{else}}暂未设置{{end}}</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Google 账号:</label>
+                        <span>{{if .profileUser.GoogleAccount}}{{.profileUser.GoogleAccount}}{{else}}暂未设置{{end}}</span>
+                    </div>
                 </div>
             </div>
         </div>

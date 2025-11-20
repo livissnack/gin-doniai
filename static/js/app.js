@@ -267,5 +267,215 @@ document.addEventListener('DOMContentLoaded', () => {
   window.scrollManager = new ScrollManager();
 });
 
+// 搜索功能
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('searchInput');
+  const searchDropdown = document.getElementById('searchDropdown');
+  const searchOptions = document.querySelectorAll('.search-option');
+  const searchButton = document.getElementById('searchButton');
+  const searchTerms = document.querySelectorAll('.search-term');
+
+
+  // 在搜索功能的DOMContentLoaded事件监听器中添加以下代码
+
+// 添加键盘导航功能
+  let selectedIndex = -1; // 当前选中的索引
+
+// 键盘事件监听
+  searchInput.addEventListener('keydown', function(e) {
+    if (searchOptions.length === 0) return;
+
+    switch(e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % searchOptions.length;
+        updateSelection();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + searchOptions.length) % searchOptions.length;
+        updateSelection();
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < searchOptions.length) {
+          // 触发选中项的点击事件
+          searchOptions[selectedIndex].click();
+        } else if (searchInput.value.trim() !== '') {
+          // 默认搜索帖子
+          performSearch(searchInput.value.trim(), 'posts');
+          searchDropdown.style.display = 'none';
+        }
+        break;
+      case 'Escape':
+        searchDropdown.style.display = 'none';
+        selectedIndex = -1;
+        clearSelection();
+        break;
+    }
+  });
+
+// 更新选中状态
+  function updateSelection() {
+    clearSelection();
+    if (selectedIndex >= 0 && selectedIndex < searchOptions.length) {
+      searchOptions[selectedIndex].classList.add('selected');
+      // 滚动到可视区域
+      searchOptions[selectedIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+// 清除所有选中状态
+  function clearSelection() {
+    searchOptions.forEach(option => {
+      option.classList.remove('selected');
+    });
+  }
+
+// 点击选项时也要更新选中状态
+  searchOptions.forEach((option, index) => {
+    option.addEventListener('mouseenter', function() {
+      selectedIndex = index;
+      updateSelection();
+    });
+
+    option.addEventListener('click', function() {
+      selectedIndex = index;
+      updateSelection();
+      // 原有的点击逻辑
+      const searchType = this.getAttribute('data-type');
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm !== '') {
+        performSearch(searchTerm, searchType);
+        searchDropdown.style.display = 'none';
+      }
+    });
+  });
+
+// 显示下拉菜单时默认选中第一个选项
+  searchInput.addEventListener('focus', function() {
+    updateSearchKeywords();
+    updateSearchTerms();
+    if (searchInput.value.trim() !== '') {
+      searchDropdown.style.display = 'block';
+      // 默认选中第一个选项
+      selectedIndex = 0;
+      updateSelection();
+    }
+  });
+
+// 输入内容时控制下拉菜单显示并更新搜索词
+  searchInput.addEventListener('input', function() {
+    updateSearchKeywords();
+    updateSearchTerms();
+    if (searchInput.value.trim() !== '') {
+      searchDropdown.style.display = 'block';
+      // 重置选中状态
+      selectedIndex = 0;
+      updateSelection();
+    } else {
+      searchDropdown.style.display = 'none';
+      selectedIndex = -1;
+      clearSelection();
+    }
+  });
+
+
+  // 输入框失去焦点时隐藏下拉菜单（延迟以允许点击选项）
+  searchInput.addEventListener('blur', function() {
+    setTimeout(() => {
+      searchDropdown.style.display = 'none';
+    }, 200);
+  });
+
+  function updateSearchKeywords() {
+    const keyword = document.getElementById('searchInput').value;
+    const keywords = document.querySelectorAll('.search-keyword');
+    keywords.forEach(element => {
+      element.textContent = keyword;
+    });
+  }
+
+
+  // 更新搜索词显示
+  function updateSearchTerms() {
+    const searchTerm = searchInput.value.trim();
+    searchTerms.forEach(term => {
+      term.textContent = searchTerm;
+    });
+  }
+
+  // 点击搜索选项
+  searchOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      const searchType = this.getAttribute('data-type');
+      const searchTerm = searchInput.value.trim();
+
+      if (searchTerm !== '') {
+        performSearch(searchTerm, searchType);
+        searchDropdown.style.display = 'none';
+      }
+    });
+  });
+
+  // 点击搜索按钮
+// 点击搜索按钮 - 修改现有的事件处理函数
+  searchButton.addEventListener('click', function() {
+    // 如果有选中的搜索选项，使用该选项进行搜索
+    if (selectedIndex >= 0 && selectedIndex < searchOptions.length) {
+      const selectedOption = searchOptions[selectedIndex];
+      const searchType = selectedOption.getAttribute('data-type');
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm !== '') {
+        performSearch(searchTerm, searchType);
+        searchDropdown.style.display = 'none';
+      }
+    } else {
+      // 默认搜索帖子
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm !== '') {
+        performSearch(searchTerm, 'posts');
+      }
+    }
+  });
+
+
+  // 回车键搜索
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm !== '') {
+        performSearch(searchTerm, 'posts');
+        searchDropdown.style.display = 'none';
+      }
+    }
+  });
+
+  // 执行搜索功能
+  function performSearch(term, type) {
+    switch(type) {
+      case 'posts':
+        // 搜索帖子逻辑
+        window.location.href = `/search?q=${encodeURIComponent(term)}`;
+        break;
+      case 'users':
+        // 搜索用户逻辑
+        window.location.href = `/member?q=${encodeURIComponent(term)}`;
+        break;
+      case 'google':
+        // 谷歌搜索逻辑
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(term)}`, '_blank');
+        break;
+    }
+  }
+
+  // 初始化时更新一次搜索词（如果有默认值）
+  if (searchInput && searchInput.value) {
+    updateSearchTerms();
+  }
+});
+
+
+
 
 
