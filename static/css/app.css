@@ -1934,6 +1934,30 @@ footer a:hover {
   color: var(--editor-text-color);
 }
 
+/* 图片样式优化 */
+.post-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 图片在段落中的样式 */
+.post-body p img {
+  margin: 0.5rem 0;
+}
+
+/* 图片悬停效果 */
+.post-body img:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
 /* Tables */
 .post-body table {
   width: 100%;
@@ -1990,6 +2014,32 @@ footer a:hover {
 
 .post-body a:hover {
   color: var(--primary-hover);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .post-body table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .post-body table th,
+  .post-body table td {
+    white-space: nowrap;
+  }
+
+  .post-body img {
+    max-width: 100%;
+    height: auto;
+    margin: 0.75rem 0;
+    border-radius: 0.25rem;
+  }
+
+  .post-body p img {
+    margin: 0.25rem 0;
+  }
 }
 
 /* 为member.tmpl页面添加作用域限定 */
@@ -2101,4 +2151,23 @@ footer a:hover {
   text-align: center;
   padding: 40px;
   color: var(--text-muted);
+}
+
+/* 在 app.css 中添加 */
+.custom-alert-container {
+  position: fixed;
+  top: 20px;
+  right: 0;
+  z-index: 10000;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .custom-alert-container {
+    top: 150px;  /* 为移动端导航条留出足够空间 */
+    padding: 10px;
+    max-width: none;
+  }
 }

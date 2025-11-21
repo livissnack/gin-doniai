@@ -2,14 +2,8 @@
 class CustomAlert {
   constructor() {
     this.container = document.createElement('div');
-    this.container.id = 'custom-alert-container';
-    this.container.style.position = 'fixed';
-    this.container.style.top = '0';
-    this.container.style.right = '0';
-    this.container.style.zIndex = '10000';
-    this.container.style.width = '100%';
-    this.container.style.maxWidth = '400px';
-    this.container.style.padding = '20px';
+    this.container.id = 'custom-alert-container'
+    this.container.className = 'custom-alert-container';
     document.body.appendChild(this.container);
   }
 
