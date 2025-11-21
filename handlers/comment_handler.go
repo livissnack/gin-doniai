@@ -24,7 +24,16 @@ func CreateComment(c *gin.Context) {
 		})
 		return
 	}
-	user = userObj.(*models.User)
+
+    // 添加额外的类型检查
+    user, ok := userObj.(*models.User)
+    if !ok || user == nil {
+        c.JSON(http.StatusUnauthorized, gin.H{
+            "success": false,
+            "message": "用户未登录",
+        })
+        return
+    }
 
 	// 解析请求数据
 	var requestData struct {

@@ -40,7 +40,9 @@ func UserAndOnlineStatusMiddleware(onlineStatusChan chan workers.OnlineStatusUpd
 		}
 
 		// 设置用户信息到上下文
-		c.Set("user", user)
+		if user != nil {
+            c.Set("user", user)
+        }
 
 		// 处理在线状态更新（只对非静态资源请求处理）
 		if user != nil && !strings.HasPrefix(c.Request.URL.Path, "/static") {

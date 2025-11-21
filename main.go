@@ -60,6 +60,7 @@ func main() {
 	}
 
 	gin.SetMode(gin.DebugMode)
+// 	gin.SetMode(gin.ReleaseMode)
 	// 初始化在线状态更新通道
 	onlineStatusChan = make(chan workers.OnlineStatusUpdate, 1000) // 缓冲1000个消息
 

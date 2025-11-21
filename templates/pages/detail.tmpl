@@ -82,9 +82,12 @@
 
         <!-- 评论列表 -->
         <div class="comment-list">
-          {{$currentUser := .user}}
+          {{$currentUserID := 0}}
+          {{if .user}}
+          {{$currentUserID = .user.ID}}
+          {{end}}
           {{range .Comments}}
-          <div class="comment-item" data-comment-id="{{.ID}}" data-user-id="{{.User.ID}}" data-current-user-id="{{$currentUser.ID}}">
+          <div class="comment-item" data-comment-id="{{.ID}}" data-user-id="{{.User.ID}}" data-current-user-id="{{$currentUserID}}">
             <div class="comment-header">
               <img src="{{.User.Avatar}}" alt="用户头像" class="avatar small">
               <div class="comment-author">{{.User.Name}}</div>
@@ -102,7 +105,7 @@
             <!-- 子评论 -->
             <div class="comment-reply">
               {{range .Replies}}
-              <div class="comment-item" data-comment-id="{{.ID}}" data-user-id="{{.User.ID}}" data-current-user-id="{{$currentUser.ID}}">
+              <div class="comment-item" data-comment-id="{{.ID}}" data-user-id="{{.User.ID}}" data-current-user-id="{{$currentUserID}}">
                 <div class="comment-header">
                   <img src="{{.User.Avatar}}" alt="用户头像" class="avatar small">
                   <div class="comment-author">{{.User.Name}}</div>
