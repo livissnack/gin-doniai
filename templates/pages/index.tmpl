@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NodeSeek社区</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3273dc;
+      --secondary-color: #00d1b2;
+      --background-color: #f5f5f5;
+      --card-color: #ffffff;
+      --text-color: #363636;
+      --border-color: #dbdbdb;
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 1.5rem 0;
+    }
+
+    .post-card {
+      margin-bottom: 1.5rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .post-meta {
+      font-size: 0.875rem;
+      color: #7a7a7a;
+    }
+
+    .post-tag {
+      margin-right: 0.5rem;
+    }
+
+    .sidebar-card {
+      margin-bottom: 1.5rem;
+      border-radius: 6px;
+    }
+
+    .footer {
+      padding: 2rem 1.5rem;
+      background-color: #fafafa;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .stats-number {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .stats-label {
+      font-size: 0.875rem;
+      color: #7a7a7a;
+    }
+
+    .topic-item {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .topic-item:last-child {
+      border-bottom: none;
+    }
+
+    .user-avatar {
+      border-radius: 50%;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--secondary-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#">
+        <strong>NodeSeek</strong>
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item is-active">
+          首页
+        </a>
+
+        <a class="navbar-item">
+          节点
+        </a>
+
+        <a class="navbar-item">
+          话题
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            更多
+          </a>
+
+          <div class="navbar-dropdown">
+            <a class="navbar-item">
+              关于我们
+            </a>
+            <a class="navbar-item">
+              社区规则
+            </a>
+            <a class="navbar-item">
+              联系我们
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item">
+              报告问题
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <a class="button is-light">
+              登录
+            </a>
+            <a class="button is-primary">
+              <strong>注册</strong>
+            </a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            <figure class="image is-32x32 mr-2">
+              <img class="user-avatar" src="https://bulma.io/images/placeholders/32x32.png">
+            </figure>
+            <span>用户名</span>
+          </a>
+
+          <div class="navbar-dropdown">
+            <a class="navbar-item">
+              个人资料
+            </a>
+            <a class="navbar-item">
+              我的帖子
+            </a>
+            <a class="navbar-item">
+              收藏
+            </a>
+            <a class="navbar-item">
+              设置
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item">
+              退出登录
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- 主要内容区 -->
+<section class="main-content">
+  <div class="container">
+    <div class="columns">
+      <!-- 左侧内容区 -->
+      <div class="column is-three-quarters">
+        <!-- 帖子列表 -->
+        <div class="box post-card">
+          <article class="media">
+            <figure class="media-left">
+              <p class="image is-64x64">
+                <img class="user-avatar" src="https://bulma.io/images/placeholders/64x64.png">
+              </p>
+            </figure>
+            <div class="media-content">
+              <div class="content">
+                <p class="title is-5">
+                  <a href="#">关于VPS性能测试的完整指南</a>
+                  <span class="tag is-primary post-tag">精华</span>
+                </p>
+                <p class="subtitle is-6 mb-2">作者: <a href="#">技术达人</a> · <span class="post-meta">2小时前</span></p>
+                <p>
+                  本文详细介绍了如何全面测试VPS的性能，包括CPU、内存、磁盘IO、网络速度等关键指标。通过实际测试案例，帮助大家选择最适合自己需求的VPS服务商...
+                </p>
+              </div>
+              <nav class="level is-mobile">
+                <div class="level-left">
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                    <span>42</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-comment"></i></span>
+                    <span>18</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                    <span>256</span>
+                  </a>
+                </div>
+              </nav>
+            </div>
+          </article>
+        </div>
+
+        <div class="box post-card">
+          <article class="media">
+            <figure class="media-left">
+              <p class="image is-64x64">
+                <img class="user-avatar" src="https://bulma.io/images/placeholders/64x64.png">
+              </p>
+            </figure>
+            <div class="media-content">
+              <div class="content">
+                <p class="title is-5">
+                  <a href="#">Node.js 18新特性解析</a>
+                  <span class="tag is-info post-tag">Node.js</span>
+                </p>
+                <p class="subtitle is-6 mb-2">作者: <a href="#">前端开发者</a> · <span class="post-meta">5小时前</span></p>
+                <p>
+                  Node.js 18带来了许多令人兴奋的新特性，包括内置的测试运行器、fetch API、Web Streams API等。本文将深入探讨这些新功能的使用方法和实际应用场景...
+                </p>
+              </div>
+              <nav class="level is-mobile">
+                <div class="level-left">
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                    <span>28</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-comment"></i></span>
+                    <span>12</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                    <span>189</span>
+                  </a>
+                </div>
+              </nav>
+            </div>
+          </article>
+        </div>
+
+        <div class="box post-card">
+          <article class="media">
+            <figure class="media-left">
+              <p class="image is-64x64">
+                <img class="user-avatar" src="https://bulma.io/images/placeholders/64x64.png">
+              </p>
+            </figure>
+            <div class="media-content">
+              <div class="content">
+                <p class="title is-5">
+                  <a href="#">Docker容器化部署最佳实践</a>
+                  <span class="tag is-success post-tag">Docker</span>
+                  <span class="tag is-warning post-tag">部署</span>
+                </p>
+                <p class="subtitle is-6 mb-2">作者: <a href="#">运维工程师</a> · <span class="post-meta">1天前</span></p>
+                <p>
+                  本文总结了在实际生产环境中使用Docker进行应用部署的最佳实践，包括镜像优化、网络配置、数据持久化、安全设置等方面，帮助开发者构建更稳定、安全的容器化应用...
+                </p>
+              </div>
+              <nav class="level is-mobile">
+                <div class="level-left">
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                    <span>35</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-comment"></i></span>
+                    <span>22</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                    <span>312</span>
+                  </a>
+                </div>
+              </nav>
+            </div>
+          </article>
+        </div>
+
+        <div class="box post-card">
+          <article class="media">
+            <figure class="media-left">
+              <p class="image is-64x64">
+                <img class="user-avatar" src="https://bulma.io/images/placeholders/64x64.png">
+              </p>
+            </figure>
+            <div class="media-content">
+              <div class="content">
+                <p class="title is-5">
+                  <a href="#">如何优化网站加载速度</a>
+                  <span class="tag is-danger post-tag">性能优化</span>
+                </p>
+                <p class="subtitle is-6 mb-2">作者: <a href="#">前端优化师</a> · <span class="post-meta">2天前</span></p>
+                <p>
+                  网站加载速度直接影响用户体验和SEO排名。本文从多个角度探讨了如何优化网站加载速度，包括代码压缩、图片优化、CDN使用、缓存策略等实用技巧...
+                </p>
+              </div>
+              <nav class="level is-mobile">
+                <div class="level-left">
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                    <span>47</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-comment"></i></span>
+                    <span>15</span>
+                  </a>
+                  <a class="level-item">
+                    <span class="icon is-small"><i class="fas fa-eye"></i></span>
+                    <span>298</span>
+                  </a>
+                </div>
+              </nav>
+            </div>
+          </article>
+        </div>
+
+        <!-- 分页 -->
+        <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+          <a class="pagination-previous">上一页</a>
+          <a class="pagination-next">下一页</a>
+          <ul class="pagination-list">
+            <li><a class="pagination-link is-current" aria-label="Page 1" aria-current="page">1</a></li>
+            <li><a class="pagination-link" aria-label="Goto page 2">2</a></li>
+            <li><a class="pagination-link" aria-label="Goto page 3">3</a></li>
+            <li><span class="pagination-ellipsis">&hellip;</span></li>
+            <li><a class="pagination-link" aria-label="Goto page 10">10</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- 右侧边栏 -->
+      <div class="column">
+        <!-- 社区统计 -->
+        <div class="box sidebar-card">
+          <h3 class="title is-5">社区统计</h3>
+          <div class="columns is-mobile has-text-centered">
+            <div class="column">
+              <div class="stats-number">1,254</div>
+              <div class="stats-label">用户</div>
+            </div>
+            <div class="column">
+              <div class="stats-number">5,678</div>
+              <div class="stats-label">帖子</div>
+            </div>
+            <div class="column">
+              <div class="stats-number">23,456</div>
+              <div class="stats-label">回复</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 热门话题 -->
+        <div class="box sidebar-card">
+          <h3 class="title is-5">热门话题</h3>
+          <div class="content">
+            <div class="topic-item">
+              <a href="#"># VPS性能测试</a>
+              <span class="tag is-light is-pulled-right">42</span>
+            </div>
+            <div class="topic-item">
+              <a href="#"># Node.js 18</a>
+              <span class="tag is-light is-pulled-right">35</span>
+            </div>
+            <div class="topic-item">
+              <a href="#"># Docker部署</a>
+              <span class="tag is-light is-pulled-right">28</span>
+            </div>
+            <div class="topic-item">
+              <a href="#"># 网站优化</a>
+              <span class="tag is-light is-pulled-right">25</span>
+            </div>
+            <div class="topic-item">
+              <a href="#"># JavaScript</a>
+              <span class="tag is-light is-pulled-right">22</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 活跃用户 -->
+        <div class="box sidebar-card">
+          <h3 class="title is-5">活跃用户</h3>
+          <div class="content">
+            <article class="media">
+              <figure class="media-left">
+                <p class="image is-32x32">
+                  <img class="user-avatar" src="https://bulma.io/images/placeholders/32x32.png">
+                </p>
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <p class="is-marginless">
+                    <strong>技术达人</strong>
+                  </p>
+                  <p class="is-size-7">发表了42篇帖子</p>
+                </div>
+              </div>
+            </article>
+            <article class="media">
+              <figure class="media-left">
+                <p class="image is-32x32">
+                  <img class="user-avatar" src="https://bulma.io/images/placeholders/32x32.png">
+                </p>
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <p class="is-marginless">
+                    <strong>前端开发者</strong>
+                  </p>
+                  <p class="is-size-7">发表了35篇帖子</p>
+                </div>
+              </div>
+            </article>
+            <article class="media">
+              <figure class="media-left">
+                <p class="image is-32x32">
+                  <img class="user-avatar" src="https://bulma.io/images/placeholders/32x32.png">
+                </p>
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <p class="is-marginless">
+                    <strong>运维工程师</strong>
+                  </p>
+                  <p class="is-size-7">发表了28篇帖子</p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- 社区公告 -->
+        <div class="box sidebar-card">
+          <h3 class="title is-5">社区公告</h3>
+          <div class="content">
+            <p>欢迎来到NodeSeek社区！请遵守社区规则，友好交流。</p>
+            <p>新功能预告：即将推出移动端APP，敬请期待！</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 页脚 -->
+<footer class="footer">
+  <div class="container">
+    <div class="columns">
+      <div class="column is-one-quarter">
+        <h4 class="title is-6">NodeSeek</h4>
+        <p>一个专注于Node.js和技术讨论的开发者社区。</p>
+      </div>
+      <div class="column">
+        <h4 class="title is-6">链接</h4>
+        <ul>
+          <li><a href="#">首页</a></li>
+          <li><a href="#">关于我们</a></li>
+          <li><a href="#">社区规则</a></li>
+          <li><a href="#">联系我们</a></li>
+        </ul>
+      </div>
+      <div class="column">
+        <h4 class="title is-6">资源</h4>
+        <ul>
+          <li><a href="#">Node.js文档</a></li>
+          <li><a href="#">技术博客</a></li>
+          <li><a href="#">开源项目</a></li>
+          <li><a href="#">学习资源</a></li>
+        </ul>
+      </div>
+      <div class="column">
+        <h4 class="title is-6">关注我们</h4>
+        <div class="buttons">
+          <a class="button is-light">
+                            <span class="icon">
+                                <i class="fab fa-github"></i>
+                            </span>
+            <span>GitHub</span>
+          </a>
+          <a class="button is-info is-light">
+                            <span class="icon">
+                                <i class="fab fa-twitter"></i>
+                            </span>
+            <span>Twitter</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="content has-text-centered">
+      <p>&copy; 2023 NodeSeek社区. 保留所有权利.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // 移动端导航菜单切换
+  document.addEventListener('DOMContentLoaded', () => {
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+    if ($navbarBurgers.length > 0) {
+      $navbarBurgers.forEach( el => {
+        el.addEventListener('click', () => {
+          const target = el.dataset.target;
+          const $target = document.getElementById(target);
+
+          el.classList.toggle('is-active');
+          $target.classList.toggle('is-active');
+        });
+      });
+    }
+  });
+</script>
+</body>
+</html>

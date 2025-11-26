@@ -143,10 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('themeChanged', function(event) { // 使用普通函数
     console.log('主题已切换至1:', event.detail);
     // window.themeManagerInstance.toggleTheme();
-    console.log('主题已切换至2:', event.detail);
   });
-
-  // 添加一些交互效果
 });
 
 
@@ -164,32 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 点击其他地方关闭下拉菜单
     document.addEventListener('click', function() {
       dropdownMenu.style.display = 'none';
-    });
-  }
-});
-
-
-// 设置页面功能
-document.addEventListener('DOMContentLoaded', function() {
-  // 个人资料表单提交
-  const profileForm = document.getElementById('profileForm');
-  if (profileForm) {
-    profileForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      // 这里可以添加保存个人资料的逻辑
-      // alert('个人资料保存成功！');
-      customAlert.info('个人资料保存成功');
-    });
-  }
-
-  // 安全设置表单提交
-  const securityForm = document.getElementById('securityForm');
-  if (securityForm) {
-    securityForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      // 这里可以添加更改密码的逻辑
-      // alert('密码更改成功！');
-      customAlert.info('密码更改成功！');
     });
   }
 });
@@ -468,6 +439,9 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSearchTerms();
   }
 });
+
+
+
 
 
 

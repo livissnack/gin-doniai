@@ -5,7 +5,7 @@ import (
 
 	"gin-doniai/database"
 	"gin-doniai/models"
-
+    "gin-doniai/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -123,4 +123,130 @@ func ForceDeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "用户永久删除成功"})
+}
+
+// UpdateUserProfile 更新用户资料
+func UpdateUserProfile(c *gin.Context) {
+    // 从上下文获取当前用户
+    userObj, exists := c.Get("user")
+    if !exists || userObj == nil {
+        c.JSON(http.StatusUnauthorized, gin.H{
+            "success": false,
+            "message": "用户未登录",
+        })
+        return
+    }
+
+    currentUser := userObj.(*models.User)
+
+    // 绑定请求数据
+    var updateData struct {
+        Motto         string `json:"motto"`
+        Github        string `json:"github"`
+        GoogleAccount string `json:"google_account"`
+    }
+
+    if err := c.ShouldBindJSON(&updateData); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{
+            "success": false,
+            "message": "请求数据格式错误",
+        })
+        return
+    }
+
+    // 更新用户信息
+    updates := make(map[string]interface{})
+    if updateData.Motto != "" {
+        updates["motto"] = updateData.Motto
+    }
+    if updateData.Github != "" {
+        updates["github"] = updateData.Github
+    }
+    if updateData.GoogleAccount != "" {
+        updates["google_account"] = updateData.GoogleAccount
+    }
+
+    if err := database.DB.Model(&models.User{}).Where("id = ?", currentUser.ID).Updates(updates).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "success": false,
+            "message": "更新失败: " + err.Error(),
+        })
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "success": true,
+        "message": "个人信息更新成功",
+    })
+}
+
+// UpdateUserPassword 修改用户密码
+func UpdateUserPassword(c *gin.Context) {
+    // 从上下文获取当前用户
+    userObj, exists := c.Get("user")
+    if !exists || userObj == nil {
+        c.JSON(http.StatusUnauthorized, gin.H{
+            "success": false,
+            "message": "用户未登录",
+        })
+        return
+    }
+
+    currentUser := userObj.(*models.User)
+
+    // 绑定请求数据
+    var passwordData struct {
+        CurrentPassword string `json:"current_password" binding:"required"`
+        NewPassword     string `json:"new_password" binding:"required"`
+    }
+
+    if err := c.ShouldBindJSON(&passwordData); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{
+            "success": false,
+            "message": "请求数据格式错误",
+        })
+        return
+    }
+
+    // 验证当前密码是否正确
+    if !utils.CheckPassword(passwordData.CurrentPassword, currentUser.Password) {
+        c.JSON(http.StatusForbidden, gin.H{
+            "success": false,
+            "message": "当前密码错误",
+        })
+        return
+    }
+
+    // 验证新密码长度
+    if len(passwordData.NewPassword) < 6 {
+        c.JSON(http.StatusBadRequest, gin.H{
+            "success": false,
+            "message": "新密码长度至少6位",
+        })
+        return
+    }
+
+    // 加密新密码
+    hashedPassword, err := utils.HashPassword(passwordData.NewPassword)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "success": false,
+            "message": "密码加密失败",
+        })
+        return
+    }
+
+    // 更新密码
+    if err := database.DB.Model(&models.User{}).Where("id = ?", currentUser.ID).Update("password", hashedPassword).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "success": false,
+            "message": "密码更新失败: " + err.Error(),
+        })
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "success": true,
+        "message": "密码修改成功",
+    })
 }

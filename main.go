@@ -137,6 +137,8 @@ func main() {
 		userRoutes.PUT("/:id", handlers.UpdateUser)               // 更新用户
 		userRoutes.DELETE("/:id", handlers.DeleteUser)            // 删除用户（软删除）
 		userRoutes.DELETE("/:id/force", handlers.ForceDeleteUser) // 强制删除
+		userRoutes.PUT("/profile", handlers.UpdateUserProfile)    // 更新用户资料
+        userRoutes.PUT("/password", handlers.UpdateUserPassword) // 修改用户密码
 	}
 
 	postRoutes := router.Group("/api/posts")
