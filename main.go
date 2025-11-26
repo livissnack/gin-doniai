@@ -117,6 +117,11 @@ func main() {
 
 	// 在 main.go 的路由部分添加
 	router.GET("/api/online/count", handlers.GetOnlineUserCount)
+	// 在路由定义部分添加
+    router.POST("/api/auth/forgot-password", handlers.ForgotPassword)
+    router.GET("/reset-password", handlers.ResetPassword)
+    router.POST("/api/auth/reset-password", handlers.ProcessResetPassword)
+
 
 	// 在 main.go 的路由定义部分添加评论路由
 	commentRoutes := router.Group("/api/comments")

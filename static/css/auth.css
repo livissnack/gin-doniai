@@ -145,6 +145,11 @@ header {
   overflow: hidden;
 }
 
+.forget-card {
+  min-width: 450px !important;
+  padding: 20px 0;
+}
+
 /* 标签页样式 */
 .auth-tabs {
   display: flex;

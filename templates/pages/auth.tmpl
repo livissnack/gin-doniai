@@ -164,6 +164,32 @@
   </div>
 </main>
 
+<!-- 忘记密码模态框 -->
+<div class="modal" id="forgotPasswordModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>找回密码</h3>
+      <button class="modal-close" id="closeForgotPasswordModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="forgotPasswordForm">
+        <div class="form-group">
+          <label for="forgotEmail">请输入您的邮箱地址</label>
+          <input type="email" id="forgotEmail" name="email" required>
+          <div class="error-message" id="forgotEmailError"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">发送重置链接</button>
+      </form>
+
+      <div id="resetSuccessMessage" class="success-message" style="display: none;">
+        <p>✅ 重置密码的链接已发送到您的邮箱，请查收。</p>
+        <p>如果未收到邮件，请检查垃圾邮件文件夹。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 {{template "footer" .}}
 
 <script src="/static/js/app.js"></script>

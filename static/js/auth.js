@@ -361,3 +361,127 @@ class AuthPage {
 document.addEventListener('DOMContentLoaded', () => {
   new AuthPage();
 });
+
+
+// 忘记密码功能
+document.addEventListener('DOMContentLoaded', function() {
+  // 获取相关元素
+  const forgotPasswordLink = document.querySelector('.forgot-password');
+  const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+  const closeForgotPasswordModal = document.getElementById('closeForgotPasswordModal');
+  const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+  const resetSuccessMessage = document.getElementById('resetSuccessMessage');
+
+  // 显示忘记密码模态框
+  if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (forgotPasswordModal) {
+        forgotPasswordModal.style.display = 'block';
+      }
+    });
+  }
+
+  // 关闭模态框
+  if (closeForgotPasswordModal) {
+    closeForgotPasswordModal.addEventListener('click', function() {
+      if (forgotPasswordModal) {
+        forgotPasswordModal.style.display = 'none';
+        // 重置表单和消息
+        if (forgotPasswordForm) {
+          forgotPasswordForm.style.display = 'block';
+        }
+        if (resetSuccessMessage) {
+          resetSuccessMessage.style.display = 'none';
+        }
+        clearErrors();
+      }
+    });
+  }
+
+  // 点击模态框外部关闭
+  if (forgotPasswordModal) {
+    forgotPasswordModal.addEventListener('click', function(e) {
+      if (e.target === forgotPasswordModal) {
+        forgotPasswordModal.style.display = 'none';
+        // 重置表单和消息
+        if (forgotPasswordForm) {
+          forgotPasswordForm.style.display = 'block';
+        }
+        if (resetSuccessMessage) {
+          resetSuccessMessage.style.display = 'none';
+        }
+        clearErrors();
+      }
+    });
+  }
+
+  // 处理忘记密码表单提交
+  if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // 清除之前的错误信息
+      clearErrors();
+
+      const email = document.getElementById('forgotEmail').value;
+
+      // 简单的邮箱验证
+      if (!isValidEmail(email)) {
+        showError('forgotEmailError', '请输入有效的邮箱地址');
+        return;
+      }
+
+      // 发送重置密码请求
+      fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email })
+      })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // 显示成功消息
+              if (forgotPasswordForm) {
+                forgotPasswordForm.style.display = 'none';
+              }
+              if (resetSuccessMessage) {
+                resetSuccessMessage.style.display = 'block';
+              }
+            } else {
+              showError('forgotEmailError', data.message || '发送重置链接失败');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showError('forgotEmailError', '网络错误，请稍后重试');
+          });
+    });
+  }
+
+  // 邮箱验证函数
+  function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+
+  // 显示错误信息
+  function showError(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+  }
+
+  // 清除所有错误信息
+  function clearErrors() {
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(element => {
+      element.textContent = '';
+      element.style.display = 'none';
+    });
+  }
+});
