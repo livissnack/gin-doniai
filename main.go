@@ -23,16 +23,16 @@ import (
 // 在 main.go 顶部添加全局变量
 var (
 	onlineStatusChan      chan workers.OnlineStatusUpdate
+    viewEventChan chan workers.ViewEvent
 	globalConfig          GlobalConfig
 	recommendedCategories []models.Category
 )
 
-// 修改 GlobalConfig 结构体，添加 Categories 字段
 type GlobalConfig struct {
 	SiteName   string
 	Theme      string
 	Version    string
-	Categories []models.Category // 添加推荐分类字段
+	Categories []models.Category
 }
 
 type OnlineStatusUpdate struct {
@@ -60,12 +60,17 @@ func main() {
 	}
 
 	gin.SetMode(gin.DebugMode)
-// 	gin.SetMode(gin.ReleaseMode)
+    // 	gin.SetMode(gin.ReleaseMode)
 	// 初始化在线状态更新通道
 	onlineStatusChan = make(chan workers.OnlineStatusUpdate, 1000) // 缓冲1000个消息
-
 	// 启动在线状态更新处理器
     go workers.HandleOnlineStatusUpdates(onlineStatusChan)
+
+    viewEventChan = make(chan workers.ViewEvent, 1000)  // 缓冲1000个消息
+
+    // 启动浏览事件处理器
+    go workers.HandleViewNumUpdates(viewEventChan)
+
 	router := gin.Default()
 	router.SetFuncMap(template.FuncMap{
 		"add": func(a, b int) int {
@@ -256,11 +261,6 @@ func homeHandler(c *gin.Context) {
 	var categories []models.Category
 	database.DB.Where("status_code = ?", 1).Find(&categories)
 
-	// 1、统计注册用户
-	// 2、统计文章数量
-	// 3、统计回复评论数量
-	// 4、数据表categories查询所有分类
-
 	data := gin.H{
 		"CurrentTime":  time.Now().Format("2006-01-02 15:04:05"),
 		"posts":        postsWithTimeAgo,
@@ -311,11 +311,29 @@ func detailHandler(c *gin.Context) {
 		id = idParts[0] // 获取 "29"
 	}
 
+    UserId := handlers.UserIDFromContext(c)
+    postId, err := strconv.ParseUint(id, 10, 32)
+    if err != nil {
+        postId = 0
+    }
+    // 发送浏览事件
+    viewEvent := workers.ViewEvent{
+        PostID:     uint(postId),
+        UserID:    UserId,
+        IP:        c.ClientIP(),
+        UserAgent: c.Request.UserAgent(),
+        Timestamp: time.Now(),
+    }
+
+    select {
+    case viewEventChan <- viewEvent:
+    default:
+        fmt.Println("浏览事件通道已满")
+    }
+
 	// 查询数据库获取文章详情，并预加载用户信息
 	var post models.Post
 	if err := database.DB.Preload("User").First(&post, id).Error; err != nil {
-		fmt.Printf("查询文章失败: %v\n", err) // 添加调试信息
-		// 如果找不到文章，返回404
 		c.HTML(http.StatusNotFound, "404.tmpl", gin.H{
 			"Message": "文章未找到",
 		})
@@ -429,10 +447,8 @@ func profileHandler(c *gin.Context) {
 
 	data := gin.H{
 		"user":        user,
-		"profileUser": user, // 当前查看的用户（自己）
+		"profileUser": user,
 	}
-	// 打印用户详细信息
-	fmt.Printf("当前用户信息: %+v\n", user)
 	c.HTML(http.StatusOK, "profile.tmpl", data)
 }
 
@@ -479,7 +495,6 @@ func publishHandler(c *gin.Context) {
 
 func registerHandler(c *gin.Context) {
 	data := gin.H{
-		"Message":     "欢迎使用 Gin 模板",
 		"CurrentPath": "/register",
 	}
 	c.HTML(http.StatusOK, "auth.tmpl", data)
@@ -487,7 +502,6 @@ func registerHandler(c *gin.Context) {
 
 func loginHandler(c *gin.Context) {
 	data := gin.H{
-		"Message":     "欢迎使用 Gin 模板",
 		"CurrentPath": "/login",
 	}
 	c.HTML(http.StatusOK, "auth.tmpl", data)

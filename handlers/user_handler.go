@@ -250,3 +250,14 @@ func UpdateUserPassword(c *gin.Context) {
         "message": "密码修改成功",
     })
 }
+
+// UserIDFromContext 从上下文中获取用户ID
+func UserIDFromContext(c *gin.Context) *uint {
+    userObj, exists := c.Get("user")
+    if exists && userObj != nil {
+        if user, ok := userObj.(*models.User); ok {
+            return &user.ID
+        }
+    }
+    return nil
+}

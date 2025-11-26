@@ -12,7 +12,6 @@ import (
     "github.com/gin-gonic/gin"
 )
 
-// ForgotPassword 处理忘记密码请求
 func ForgotPassword(c *gin.Context) {
     var requestData struct {
         Email string `json:"email" binding:"required,email"`
@@ -184,12 +183,10 @@ func ProcessResetPassword(c *gin.Context) {
     })
 }
 
-// 生成随机重置令牌
 func generateResetToken() string {
     return generateUUID()
 }
 
-// 生成安全的随机令牌（备用方案）
 func generateSecureToken() string {
     bytes := make([]byte, 32)
     if _, err := rand.Read(bytes); err != nil {
@@ -201,7 +198,6 @@ func generateSecureToken() string {
 func generateUUID() string {
     uuid := make([]byte, 16)
     rand.Read(uuid)
-    // 设置版本号(4)和变体
     uuid[6] = (uuid[6] & 0x0f) | 0x40
     uuid[8] = (uuid[8] & 0x3f) | 0x80
     return fmt.Sprintf("%x-%x-%x-%x-%x",

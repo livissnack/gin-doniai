@@ -3,11 +3,9 @@ package middlewares
 import (
 	"fmt"
 	"strings"
-
 	"gin-doniai/database"
 	"gin-doniai/models"
 	"gin-doniai/workers"
-
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )

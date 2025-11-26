@@ -24,7 +24,7 @@ type Post struct {
     DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 
     // 明确指定外键关系
-    User User `json:"user" gorm:"foreignKey:UserId;references:ID"`
+    User        User           `gorm:"foreignKey:UserID"`
 }
 
 

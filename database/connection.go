@@ -6,9 +6,7 @@ import (
 	"os"
 	"sync"
 	"time"
-
 	"gin-doniai/models"
-
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -29,7 +27,6 @@ func GetInstance() *gorm.DB {
 
 // initDB 初始化数据库连接
 func initDB() {
-	// 加载 .env 文件
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("警告: 未能加载 .env 文件")
@@ -67,11 +64,8 @@ func initDB() {
 	DB.AutoMigrate(&models.PostFavorite{})
 	DB.AutoMigrate(&models.UserOnlineStatus{})
     DB.AutoMigrate(&models.PasswordReset{})
-
-	log.Println("数据库连接成功")
 }
 
-// InitDB 保持向后兼容性
 func InitDB() {
 	GetInstance()
 }
