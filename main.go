@@ -60,7 +60,7 @@ func main() {
 	}
 
 	gin.SetMode(gin.DebugMode)
-    // 	gin.SetMode(gin.ReleaseMode)
+    // gin.SetMode(gin.ReleaseMode)
 	// 初始化在线状态更新通道
 	onlineStatusChan = make(chan workers.OnlineStatusUpdate, 1000) // 缓冲1000个消息
 	// 启动在线状态更新处理器
@@ -162,6 +162,12 @@ func main() {
 		postRoutes.DELETE("/:id/force", handlers.ForceDeletePost) // 强制删除
 		postRoutes.POST("/:id/favorite", handlers.FavoritePost)   // 文章收藏
 	}
+
+    router.NoRoute(func(c *gin.Context) {
+        c.HTML(http.StatusNotFound, "404.tmpl", gin.H{
+            "Message": "页面未找到",
+        })
+    })
 
 	// 启动定时清理任务
 	go func() {
