@@ -120,6 +120,13 @@ func main() {
 	router.GET("/search", searchPostsHandler)
 	router.GET("/member", searchUsersHandler)
 
+	// 在 main.go 的路由定义部分添加
+    router.GET("/auth/github", handlers.GitHubLogin)
+    router.GET("/auth/github/callback", handlers.GitHubCallback)
+    router.GET("/auth/google", handlers.GoogleLogin)
+    router.GET("/auth/google/callback", handlers.GoogleCallback)
+
+
 	// 在 main.go 的路由部分添加
 	router.GET("/api/online/count", handlers.GetOnlineUserCount)
 	// 在路由定义部分添加

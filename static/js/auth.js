@@ -17,6 +17,8 @@ class AuthPage {
     this.initFormValidation();
     // 根据URL参数设置初始标签页
     this.switchTab(this.currentTab);
+    // 初始化第三方登录按钮
+    this.initSocialLogin();
   }
 
   // 初始化标签页切换
@@ -64,6 +66,25 @@ class AuthPage {
         const type = input.type === 'password' ? 'text' : 'password';
         input.type = type;
         e.target.textContent = type === 'password' ? '👁️' : '🔒';
+      });
+    });
+  }
+
+  // 初始化第三方登录按钮
+  initSocialLogin() {
+    // GitHub登录按钮
+    const githubButtons = document.querySelectorAll('.btn-github');
+    githubButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        window.location.href = '/auth/github';
+      });
+    });
+
+    // Google登录按钮
+    const googleButtons = document.querySelectorAll('.btn-google');
+    googleButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        window.location.href = '/auth/google';
       });
     });
   }
@@ -361,7 +382,6 @@ class AuthPage {
 document.addEventListener('DOMContentLoaded', () => {
   new AuthPage();
 });
-
 
 // 忘记密码功能
 document.addEventListener('DOMContentLoaded', function() {
