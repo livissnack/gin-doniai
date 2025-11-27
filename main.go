@@ -216,10 +216,16 @@ func homeHandler(c *gin.Context) {
 	var categoryId uint
 	if categoryType != "" {
 		var category models.Category
-		if err := database.DB.Where("alias = ?", categoryType).First(&category).Error; err == nil {
-			categoryId = category.ID
-			dbQuery = dbQuery.Where("category_id = ?", categoryId)
-		}
+	    if err := database.DB.Where("alias = ?", categoryType).First(&category).Error; err != nil {
+            // 当找不到分类时，返回404页面而不是继续执行
+            c.HTML(http.StatusNotFound, "404.tmpl", gin.H{
+                "Message": "分类未找到",
+            })
+            return
+        } else {
+            categoryId = category.ID
+            dbQuery = dbQuery.Where("category_id = ?", categoryId)
+        }
 	}
 	dbQuery.Count(&total)
 
