@@ -21,39 +21,47 @@
              <div class="card-title">用户列表</div>
            </div>
 
-           <div class="user-grid">
+           <div class="member-grid">
              {{range .users}}
-             <div class="user-card">
-               <div class="user-avatar">
-                 <img src="{{.Avatar}}" alt="{{.Name}}" class="user-avatar-img">
+             <div class="member-card">
+               <div class="member-avatar">
+                 <img src="{{.Avatar}}" alt="{{.Name}}" class="member-avatar-img">
                </div>
-               <div class="user-info">
-                 <h3 class="user-name">{{.Name}}</h3>
-                 <p class="join-time">加入时间: {{.TimeAgo}}</p>
-                 <div class="user-stats">
-                   <div class="stat-item">
-                     <span class="stat-label">等级</span>
-                     <span class="stat-value">{{.Level}}</span>
-                   </div>
-                   <div class="stat-item">
-                     <span class="stat-label">帖子</span>
-                     <span class="stat-value">0</span>
-                   </div>
-                   <div class="stat-item">
-                     <span class="stat-label">评论</span>
-                     <span class="stat-value">0</span>
-                   </div>
-                   <div class="stat-item">
-                     <span class="stat-label">关注</span>
-                     <span class="stat-value">0</span>
-                   </div>
-                   <div class="stat-item">
-                     <span class="stat-label">粉丝</span>
-                     <span class="stat-value">0</span>
+               <div class="member-info">
+                 <div class="member-info-item">
+                   <h3 class="member-name">{{.Name}}</h3>
+                 </div>
+                 <div class="member-info-item">
+                   <p class="join-time">加入时间: {{.TimeAgo}}</p>
+                 </div>
+
+                 <div class="member-info-item">
+                   <div class="member-stats">
+                     <div class="stat-item">
+                       <span class="stat-label">等级</span>
+                       <span class="stat-value">{{.Level}}</span>
+                     </div>
+                     <div class="stat-item">
+                       <span class="stat-label">帖子</span>
+                       <span class="stat-value">0</span>
+                     </div>
+                     <div class="stat-item">
+                       <span class="stat-label">评论</span>
+                       <span class="stat-value">0</span>
+                     </div>
+                     <div class="stat-item">
+                       <span class="stat-label">关注</span>
+                       <span class="stat-value">0</span>
+                     </div>
+                     <div class="stat-item">
+                       <span class="stat-label">粉丝</span>
+                       <span class="stat-value">0</span>
+                     </div>
                    </div>
                  </div>
                </div>
-               <div class="user-actions">
+
+               <div class="member-actions">
                  <button class="btn btn-follow">关注</button>
                  <button class="btn btn-message">私信</button>
                </div>

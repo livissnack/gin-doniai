@@ -25,7 +25,7 @@
               <img src="{{.User.Avatar}}" alt="用户头像" class="avatar avatar-default">
               <div class="author-details">
                 <span class="author-name">{{.User.Name}}</span>
-                <span class="post-time">发布于 2小时前</span>
+                <span class="post-time">发布于 {{timeAgo .Post.CreatedAt}}</span>
               </div>
             </div>
             <div class="post-stats">
@@ -184,32 +184,23 @@
         <div class="card-header">
           <div class="card-title">相关帖子</div>
         </div>
+        {{if .RelatedPosts}}
         <div class="post-list">
+
+          {{range .RelatedPosts}}
           <div class="post-item">
-            <a href="#" class="post-title">Linode vs DigitalOcean 深度对比评测</a>
+            <a href="#" class="post-title">{{ .Title }}</a>
             <div class="post-meta">
-              <span>作者: cloudcompare</span>
-              <span>回复: 18</span>
-              <span>1天前</span>
+              <span>作者: {{ .Author }}</span>
+              <span>回复: {{ .Replies }}</span>
+              <span>发布于 {{timeAgo .CreatedAt}}</span>
             </div>
           </div>
-          <div class="post-item">
-            <a href="#" class="post-title">如何优化VPS性能：系统调优指南</a>
-            <div class="post-meta">
-              <span>作者: sysadmin</span>
-              <span>回复: 32</span>
-              <span>2天前</span>
-            </div>
-          </div>
-          <div class="post-item">
-            <a href="#" class="post-title">云服务成本控制策略与实践</a>
-            <div class="post-meta">
-              <span>作者: costmanager</span>
-              <span>回复: 15</span>
-              <span>3天前</span>
-            </div>
-          </div>
+          {{end}}
         </div>
+        {{else}}
+        <div>暂无相关帖子</div>
+        {{end}}
       </div>
     </div>
 
@@ -248,7 +239,7 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">热门节点</div>
+          <div class="card-title">热门标签</div>
         </div>
         <div class="node-list">
           <a href="#" class="node-tag">VPS</a>

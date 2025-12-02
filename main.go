@@ -86,6 +86,13 @@ func main() {
 			}
 			return result
 		},
+        "currentYear": func() int {
+            return time.Now().Year()
+        },
+        "timeAgo": func(t time.Time) string {
+            return utils.GetTimeAgo(t)
+        },
+        // 写一个友好化时间，utils/time 里面有这个方法，注入一下
 		// 添加获取全局配置的函数
 		"global": func() GlobalConfig {
 			return globalConfig
@@ -430,6 +437,13 @@ func detailHandler(c *gin.Context) {
 	database.DB.Model(&models.Post{}).Where("user_id = ?", post.User.ID).Select("SUM(replies)").Row().Scan(&replyCount)
 	database.DB.Model(&models.Post{}).Where("user_id = ?", post.User.ID).Select("SUM(likes)").Row().Scan(&likeCount)
 	// 将评论分页信息添加到模板数据
+    fmt.Printf("当前文章ID: %s, 分类ID: %d\n", id, post.CategoryId)
+	// 搜索3条相关的文章数据
+	var relatedPosts []models.Post
+    database.DB.Where("id != ? AND category_id = ?", id, post.CategoryId).
+        Order("RAND()").
+        Limit(3).
+        Find(&relatedPosts)
 	data := gin.H{
 		"Post":               post,
 		"User":               post.User,
@@ -447,6 +461,7 @@ func detailHandler(c *gin.Context) {
 		"postCount":          postCount,
 		"replyCount":         replyCount,
 		"likeCount":          likeCount,
+		"RelatedPosts":       relatedPosts,
 	}
 
 	c.HTML(http.StatusOK, "detail.tmpl", data)

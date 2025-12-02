@@ -2,9 +2,8 @@
 <header>
   <div class="container">
     <div class="navbar">
-      <a href="/" class="logo">{{(global).SiteName}}</a>
-
       <div class="nav-links">
+        <a href="/" class="logo">{{(global).SiteName}}</a>
         {{range (global).Categories}}
         <a href="/categories/{{.Alias}}">{{.Name}}</a>
         {{end}}

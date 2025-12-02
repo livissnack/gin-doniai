@@ -112,12 +112,16 @@ header {
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: 20px;
 }
 
 .nav-links a {
   color: var(--text-color);
-  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 10px;
   border-radius: 4px;
 }
 
@@ -1012,6 +1016,13 @@ footer a:hover {
   margin-right: 8px;
 }
 
+.user-avatar .user-avatar-img{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
 .username {
   font-weight: 500;
   margin-right: 5px;
@@ -1721,117 +1732,6 @@ footer a:hover {
   padding: 20px;
 }
 
-/* 为member.tmpl页面添加作用域限定 */
-.member-page .user-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 20px 0;
-}
-
-.member-page .user-card {
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  background: var(--card-bg);
-  box-shadow: var(--shadow);
-  transition: box-shadow 0.2s ease;
-}
-
-.member-page .user-card:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.member-page .user-avatar .avatar-img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin: 0 auto 15px;
-  border: 2px solid var(--border-color);
-}
-
-.member-page .user-name {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  color: var(--text-color);
-}
-
-.member-page .join-time {
-  color: var(--text-muted);
-  font-size: 14px;
-  margin: 0 0 15px 0;
-}
-
-.member-page .user-stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin: 15px 0;
-}
-
-.member-page .stat-item {
-  font-size: 14px;
-}
-
-.member-page .stat-label {
-  color: var(--text-muted);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.member-page .stat-value {
-  font-weight: 600;
-  color: var(--text-color);
-  display: block;
-}
-
-.member-page .user-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.member-page .btn-follow,
-.member-page .btn-message {
-  flex: 1;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-
-.member-page .btn-follow {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.member-page .btn-follow:hover {
-  background-color: var(--primary-hover);
-}
-
-.member-page .btn-message {
-  background-color: var(--success-color);
-  color: white;
-}
-
-.member-page .btn-message:hover {
-  background-color: #218838;
-}
-
-.member-page .no-users {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 40px;
-  color: var(--text-muted);
-}
-
 .share-modal {
   position: fixed;
   top: 0;
@@ -1956,6 +1856,31 @@ footer a:hover {
     margin-top: 10px;
     width: 100%;
     justify-content: center;
+    flex-wrap: wrap; /* 允许换行 */
+    gap: 5px; /* 减小间隙 */
+  }
+
+  .nav-links a {
+    padding: 8px 12px; /* 调整内边距 */
+    font-size: 0.9rem; /* 减小字体 */
+    white-space: nowrap; /* 防止文字换行 */
+  }
+
+  /* 当导航项过多时的滚动处理 */
+  .nav-links {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 5px 10px;
+  }
+
+  /* 隐藏滚动条但仍可滚动 */
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   .user-actions {
@@ -1963,8 +1888,8 @@ footer a:hover {
   }
 
   .post-meta {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    justify-content: flex-start;
     flex-wrap: wrap;
   }
 
@@ -2012,8 +1937,10 @@ footer a:hover {
   }
 
   .pagination {
-    flex-direction: column;
-    gap: 15px;
+    justify-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
   }
 
   .pagination-nav {
@@ -2080,7 +2007,7 @@ footer a:hover {
   }
 
   .custom-alert-container {
-    top: 70px;  /* 为移动端导航条留出足够空间 */
+    top: 170px;  /* 为移动端导航条留出足够空间 */
     padding: 10px;
     max-width: none;
   }
