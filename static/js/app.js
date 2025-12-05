@@ -440,6 +440,79 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+  // 获取菜单项和内容区域
+  const menuItems = document.querySelectorAll('.operate-menu .menu-item');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  // 页面加载时根据URL参数激活对应tab
+  activateTabFromUrl();
+
+  // 为菜单项绑定点击事件
+  menuItems.forEach(item => {
+    item.addEventListener('click', function() {
+      // 清除所有激活状态
+      menuItems.forEach(menuItem => menuItem.classList.remove('is-active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // 激活当前菜单项
+      this.classList.add('is-active');
+
+      // 显示对应的内容区域
+      const tabName = this.getAttribute('data-tab');
+      const targetTab = document.getElementById(tabName + '-tab');
+      if (targetTab) {
+        targetTab.classList.add('active');
+      }
+
+      // 更新URL参数
+      updateUrlParameter('tab', tabName);
+
+      // 重置page参数
+      resetPageParameter();
+    });
+  });
+
+  // 根据URL参数激活对应tab
+  function activateTabFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+
+    if (tabParam) {
+      // 移除所有激活状态
+      menuItems.forEach(menuItem => menuItem.classList.remove('is-active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // 激活对应tab
+      const targetMenuItem = document.querySelector(`.menu-item[data-tab="${tabParam}"]`);
+      const targetTab = document.getElementById(tabParam + '-tab');
+
+      if (targetMenuItem && targetTab) {
+        targetMenuItem.classList.add('is-active');
+        targetTab.classList.add('active');
+      }
+    }
+  }
+
+  // 更新URL参数
+  function updateUrlParameter(param, value) {
+    const url = new URL(window.location);
+    url.searchParams.set(param, value);
+    window.history.replaceState({}, '', url);
+  }
+
+  // 重置页面参数函数
+  function resetPageParameter() {
+    const url = new URL(window.location);
+    const currentPage = url.searchParams.get('page');
+
+    // 如果当前有page参数且不为1，则移除page参数
+    if (currentPage && currentPage !== '1') {
+      url.searchParams.delete('page');
+      window.history.replaceState({}, '', url);
+    }
+  }
+});
 
 
 

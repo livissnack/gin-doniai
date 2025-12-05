@@ -92,8 +92,6 @@ func main() {
         "timeAgo": func(t time.Time) string {
             return utils.GetTimeAgo(t)
         },
-        // 写一个友好化时间，utils/time 里面有这个方法，注入一下
-		// 添加获取全局配置的函数
 		"global": func() GlobalConfig {
 			return globalConfig
 		},
@@ -121,8 +119,10 @@ func main() {
 	router.POST("/login", loginSubmit)
 	router.GET("/logout", logoutHandler)
 	router.GET("/profile", profileHandler)
+	router.GET("/posts", articleHandler)
 	router.GET("/publish", publishHandler)
 	router.GET("/settings", settingsHandler)
+	router.GET("/rss", rssHandler)
 	// 添加搜索路由
 	router.GET("/search", searchPostsHandler)
 	router.GET("/member", searchUsersHandler)
@@ -245,7 +245,7 @@ func homeHandler(c *gin.Context) {
 
 	// 查询当前页的帖子
 	var posts []models.Post
-	postQuery := database.DB.Order("created_at DESC").Offset(offset).Limit(limit)
+	postQuery := database.DB.Where("category_id > ?", 0).Order("created_at DESC").Offset(offset).Limit(limit)
 
 	if categoryId > 0 {
 		postQuery = postQuery.Where("category_id = ?", categoryId)
@@ -479,12 +479,157 @@ func profileHandler(c *gin.Context) {
 		return
 	}
 
+    var postCount int64
+    database.DB.Model(&models.Post{}).Where("category_id > ?", 0).Where("user_id = ?", user.ID).Count(&postCount)
+
 	data := gin.H{
 		"user":        user,
 		"profileUser": user,
+		"postCount":   postCount,
 	}
 	c.HTML(http.StatusOK, "profile.tmpl", data)
 }
+
+func articleHandler(c *gin.Context) {
+    // 从上下文获取用户信息
+    userObj, exists := c.Get("user")
+    var user *models.User
+    if exists && userObj != nil {
+        user = userObj.(*models.User)
+    } else {
+        // 用户未登录，重定向到登录页面
+        c.Redirect(http.StatusFound, "/login")
+        return
+    }
+
+    // 获取tab参数
+    tab := c.Query("tab")
+    if tab == "" {
+        tab = "articles" // 默认tab
+    }
+
+    // 获取页码参数，默认为第1页
+    pageStr := c.Query("page")
+    page := 1
+    if pageStr != "" {
+        if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+            page = p
+        }
+    }
+
+    // 每页显示的数量
+    limit := 5
+    offset := (page - 1) * limit
+
+    // 1. 根据用户id，查询用户的帖子，从posts表查
+    var userPosts []models.Post
+    var totalUserPosts int64
+    database.DB.Model(&models.Post{}).Where("category_id > ?", 0).Where("user_id = ?", user.ID).Count(&totalUserPosts)
+    database.DB.Where("category_id > ?", 0).Where("user_id = ?", user.ID).Order("created_at DESC").Offset(offset).Limit(limit).Find(&userPosts)
+
+    // 2. 根据用户id，查询用户的评论，从comments表查,并通过post_id关联查出posts表中的title
+    type CommentWithPostTitle struct {
+        models.Comment
+        PostTitle string
+        TimeAgo   string
+    }
+
+    var userComments []CommentWithPostTitle
+    var totalUserComments int64
+
+    // 先查询总数
+    database.DB.Table("comments c").
+        Joins("LEFT JOIN posts p ON c.post_id = p.id").
+        Where("c.user_id = ?", user.ID).
+        Count(&totalUserComments)
+
+    // 查询评论及关联的文章标题
+    database.DB.Table("comments c").
+        Select("c.*, p.title as post_title").
+        Joins("LEFT JOIN posts p ON c.post_id = p.id").
+        Where("c.user_id = ?", user.ID).
+        Order("c.created_at DESC").
+        Offset(offset).
+        Limit(limit).
+        Scan(&userComments)
+
+    // 处理评论的时间显示
+    for i := range userComments {
+        userComments[i].TimeAgo = utils.GetTimeAgo(userComments[i].CreatedAt)
+    }
+
+    // 3. 根据用户id，查询用户收藏的帖子，从post_favorites表查,并通过post_id关联查出posts表中的title
+    type FavoritePost struct {
+        models.Post
+        TimeAgo string
+    }
+
+    var favoritePosts []FavoritePost
+    var totalFavoritePosts int64
+
+    // 先查询总数
+    database.DB.Table("post_favorites pf").
+        Joins("LEFT JOIN posts p ON pf.post_id = p.id").
+        Where("pf.user_id = ?", user.ID).
+        Count(&totalFavoritePosts)
+
+    // 查询收藏的文章
+    database.DB.Table("post_favorites pf").
+        Select("p.*, pf.created_at as favorite_time").
+        Joins("LEFT JOIN posts p ON pf.post_id = p.id").
+        Where("pf.user_id = ?", user.ID).
+        Order("pf.created_at DESC").
+        Offset(offset).
+        Limit(limit).
+        Scan(&favoritePosts)
+
+    // 处理收藏文章的时间显示
+    for i := range favoritePosts {
+        favoritePosts[i].TimeAgo = utils.GetTimeAgo(favoritePosts[i].CreatedAt)
+    }
+
+    // 计算总页数
+    totalPostPages := int((totalUserPosts + int64(limit) - 1) / int64(limit))
+    totalCommentPages := int((totalUserComments + int64(limit) - 1) / int64(limit))
+    totalFavoritePages := int((totalFavoritePosts + int64(limit) - 1) / int64(limit))
+
+    data := gin.H{
+        "user":              user,
+        "profileUser":       user,
+        "articles":          userPosts,
+        "comments":          userComments,
+        "favorites":         favoritePosts,
+        "currentPage":       page,
+        "currentTab":        tab, // 添加当前tab信息
+        "totalUserPosts":    totalUserPosts,
+        "totalUserComments": totalUserComments,
+        "totalFavoritePosts":totalFavoritePosts,
+        "totalPostPages":    totalPostPages,
+        "totalCommentPages": totalCommentPages,
+        "totalFavoritePages": totalFavoritePages,
+        "hasPrev":           page > 1,
+        "hasNext":           page < getTotalPagesForTab(tab, totalPostPages, totalCommentPages, totalFavoritePages),
+        "prevPage":          page - 1,
+        "nextPage":          page + 1,
+    }
+    c.HTML(http.StatusOK, "article-list.tmpl", data)
+}
+
+// 辅助函数：根据tab获取对应的总页数
+func getTotalPagesForTab(tab string, postPages, commentPages, favoritePages int) int {
+    switch tab {
+    case "articles":
+        return postPages
+    case "comments":
+        return commentPages
+    case "favorites":
+        return favoritePages
+    default:
+        return postPages
+    }
+}
+
+
 
 func settingsHandler(c *gin.Context) {
 	// 从上下文获取用户信息
@@ -896,4 +1041,48 @@ func searchUsersHandler(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "member.tmpl", data)
 }
+
+func rssHandler(c *gin.Context) {
+    // 查询最新的帖子
+    var posts []models.Post
+    database.DB.Order("created_at DESC").Limit(20).Find(&posts)
+
+    // 获取当前域名
+    scheme := "http"
+    if c.Request.TLS != nil {
+        scheme = "https"
+    }
+    currentDomain := scheme + "://" + c.Request.Host
+
+    // 构造XML内容
+    xmlContent := `<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<channel>
+<title>Doniai技术社区</title>
+<link>` + currentDomain + `</link>
+<description>技术社区最新帖子</description>
+<language>zh-CN</language>
+<lastBuildDate>` + time.Now().Format(time.RFC1123Z) + `</lastBuildDate>
+`
+
+    for _, post := range posts {
+        postLink := currentDomain + "/post-" + fmt.Sprintf("%d", post.ID) + "-1"
+        xmlContent += "<item>"
+        xmlContent += "<title>" + template.HTMLEscapeString(post.Title) + "</title>"
+        xmlContent += "<link>" + postLink + "</link>"
+        xmlContent += "<description><![CDATA[" + post.Content + "]]></description>"
+        xmlContent += "<pubDate>" + post.CreatedAt.Format(time.RFC1123Z) + "</pubDate>"
+        xmlContent += "<guid>" + postLink + "</guid>"
+        xmlContent += "</item>"
+    }
+
+    xmlContent += `
+</channel>
+</rss>`
+
+    c.Header("Content-Type", "application/rss+xml; charset=utf-8")
+
+    c.String(http.StatusOK, xmlContent)
+}
+
 

@@ -70,3 +70,16 @@ sudo systemctl status discuss-web.service
 # 查看日志
 sudo journalctl -u discuss-web.service -f
 ```
+
+![电脑1](https://pic.114156.xyz/uploads/0EXDab7wpK64.webp)
+![电脑2](https://pic.114156.xyz/uploads/GVpQ3nTdSmlO.webp)
+![电脑3](https://pic.114156.xyz/uploads/FO87l7BCs4tv.webp)
+![电脑4](https://pic.114156.xyz/uploads/6f8jUrl0Ra4X.webp)
+![电脑5](https://pic.114156.xyz/uploads/jj4-UENslx2m.webp)
+![电脑6](https://pic.114156.xyz/uploads/Vy7ylFAyjrvt.webp)
+![电脑7](https://pic.114156.xyz/uploads/_C5yxyLmCE77.webp)
+![电脑8](https://pic.114156.xyz/uploads/6WF1S7YVOiAR.webp)
+![电脑9](https://pic.114156.xyz/uploads/nS8RacZ8GJtF.webp)
+
+
+bash /root/.acme.sh/acme.sh --issue --dns dns_ali -d livissnack.com -d "*.livissnack.com" --set-default-ca --server letsencrypt

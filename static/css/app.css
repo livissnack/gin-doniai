@@ -20,6 +20,7 @@
   --bg-sub-color: #3b3b3b;
   --fade-color: #555;
   --link-color: #c5c5c5;
+  --link-hover-color: #fcfcfc;
   --editor-text-color: #aaaaaa;
   --editor-expression-box: #515151;
   --icon-bg-color: rgba(0, 0, 0, 0.1);
@@ -30,6 +31,7 @@
   --table-text-color: #e0e0e0;
   --table-alt-row-bg: #3a3a3a;
   --table-hover-bg: #404040;
+  --text-hover-color: #ffffff;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -54,6 +56,7 @@
   --table-text-color: #333333;
   --table-alt-row-bg: #f9f9f9;
   --table-hover-bg: #f5f5f5;
+  --text-hover-color: #1a78e8;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -430,7 +433,7 @@ footer a:hover {
 }
 
 .footer-section li a:hover {
-  color: var(--hover-color); /* 悬停时的颜色 */
+  color: var(--text-hover-color); /* 悬停时的颜色 */
 }
 
 .quick-post a {
@@ -2110,3 +2113,271 @@ footer a:hover {
   text-decoration: underline;
 }
 
+.article-list-main {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.article-list-main .doi-container {
+  width: 1080px;
+  min-height: 600px;
+}
+
+.article-list-main .doi-container .doi-user-card {
+  display: flex;
+  justify-content: flex-start;
+  background: var(--bg-sub-color);
+  padding: 24px;
+  border-radius: 8px;
+}
+
+.article-list-main .doi-container .doi-user-card .user-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.article-list-main .doi-container .article-list {
+  margin-top: 24px;
+  background: var(--bg-sub-color);
+  padding: 24px;
+  border-radius: 8px;
+}
+
+.article-list-main .doi-container .article-list .operate-menu {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+}
+
+.article-list-main .doi-container .article-list .operate-menu .menu-item {
+  color: var(--link-color);
+}
+
+.article-list-main .doi-container .article-list .operate-menu .is-active {
+  border-bottom: 1px solid #0000ff;
+}
+
+.article-list-main .doi-container .article-list .operate-menu .menu-item:hover {
+  border-bottom: 1px solid #9191ff;
+  color: var(--link-hover-color);
+}
+
+.article-list-main .doi-container .article-list .hr {
+  border-top: 1px solid #080845;
+  padding: 6px 0;
+}
+
+.article-list-main .doi-container .article-list .list .article-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 8px;
+  background: #000000;
+  border-radius: 4px;
+}
+
+.article-list-main .doi-container .article-list .list .article-item:not(:last-child) {
+  margin-bottom: 12px;
+}
+
+.article-list-main .doi-container .article-list .list .article-item .article-title:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.doi-pagination-box {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.doi-pagination-box .doi-page .item-page {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.doi-pagination-box .doi-page .item-page:hover {
+  background: var(--primary-hover);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.article-list-main .doi-container .article-list .doi-comment-list {
+  border-radius: 4px;
+  background: #000000;
+  padding: 2px 8px;
+}
+
+.article-list-main .doi-container .article-list .doi-comment-list .doi-comment-item {
+  padding-bottom: 0 !important;
+  border-bottom: 1px dashed #464646 !important;
+}
+
+.article-list-main .doi-container .article-list .doi-comment-list .doi-comment-item .doi-comment-article-title {
+  color: #ffffff;
+}
+
+.article-list-main .doi-container .article-list .doi-comment-list .doi-comment-item .doi-comment-content {
+  color: #333333;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 2px 6px;
+}
+
+
+.article-list-main .doi-container .article-list .doi-comment-list .doi-pagination-box {
+  padding-bottom: 40px;
+}
+
+.doi-comment-pagination {
+  margin-top: 24px;
+}
+
+.doi-empty-img-box {
+  display: flex;
+  justify-content: center;
+}
+
+.doi-empty-img-box .empty-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.current-page {
+  padding: 0 10px;
+}
+
+.doi-post-data {
+  margin-left: auto; /* 靠右对齐 */
+}
+
+.post-num {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.post-num:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 亮色主题下的样式 */
+.light-theme .post-num {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.light-theme .post-num:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 暗黑主题下的样式 */
+.dark-theme .post-num {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  border: 2px solid #4a5568;
+}
+
+.dark-theme .post-num:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, #4c51bf 0%, #5b3dc9 100%);
+}
+
+.post-count {
+  font-size: 1.1em;
+}
+
+.about-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.about-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.about-section h1,
+.about-section h2,
+.about-section h3 {
+  color: var(--text-color);
+  margin-bottom: 15px;
+}
+
+.about-section h1 {
+  font-size: 2rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+}
+
+.about-section h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.about-section h3 {
+  font-size: 1.2rem;
+  margin-top: 20px;
+}
+
+.about-section p {
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 15px;
+}
+
+.team-list,
+.tech-list,
+.plans-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.team-list li,
+.tech-list li,
+.plans-list li {
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border-color);
+  color: var(--text-color);
+}
+
+.team-list li:before,
+.tech-list li:before,
+.plans-list li:before {
+  content: "•";
+  color: var(--primary-color);
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-right: 10px;
+}
