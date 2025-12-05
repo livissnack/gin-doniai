@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"encoding/xml"
     "gin-doniai/middlewares"
 	"gin-doniai/caches"
 	"gin-doniai/database"
@@ -1054,35 +1055,58 @@ func rssHandler(c *gin.Context) {
     }
     currentDomain := scheme + "://" + c.Request.Host
 
-    // 构造XML内容
-    xmlContent := `<?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
-<channel>
-<title>Doniai技术社区</title>
-<link>` + currentDomain + `</link>
-<description>技术社区最新帖子</description>
-<language>zh-CN</language>
-<lastBuildDate>` + time.Now().Format(time.RFC1123Z) + `</lastBuildDate>
-`
-
-    for _, post := range posts {
-        postLink := currentDomain + "/post-" + fmt.Sprintf("%d", post.ID) + "-1"
-        xmlContent += "<item>"
-        xmlContent += "<title>" + template.HTMLEscapeString(post.Title) + "</title>"
-        xmlContent += "<link>" + postLink + "</link>"
-        xmlContent += "<description><![CDATA[" + post.Content + "]]></description>"
-        xmlContent += "<pubDate>" + post.CreatedAt.Format(time.RFC1123Z) + "</pubDate>"
-        xmlContent += "<guid>" + postLink + "</guid>"
-        xmlContent += "</item>"
+    // 构造RSS数据结构
+    type RSSItem struct {
+        Title       string    `xml:"title"`
+        Link        string    `xml:"link"`
+        Description string    `xml:"description"`
+        PubDate     time.Time `xml:"pubDate"`
+        GUID        string    `xml:"guid"`
     }
 
-    xmlContent += `
-</channel>
-</rss>`
+    type RSSChannel struct {
+        XMLName     xml.Name  `xml:"rss"`
+        Version     string    `xml:"version,attr"`
+        NSDC        string    `xml:"xmlns:dc,attr"`
+        NSContent   string    `xml:"xmlns:content,attr"`
+        NSAtom      string    `xml:"xmlns:atom,attr"`
+        Channel     struct {
+            Title       string    `xml:"title"`
+            Link        string    `xml:"link"`
+            Description string    `xml:"description"`
+            Language    string    `xml:"language"`
+            LastBuildDate string  `xml:"lastBuildDate"`
+            Items       []RSSItem `xml:"item"`
+        } `xml:"channel"`
+    }
 
-    c.Header("Content-Type", "application/rss+xml; charset=utf-8")
+    rss := RSSChannel{
+        Version:   "2.0",
+        NSDC:      "http://purl.org/dc/elements/1.1/",
+        NSContent: "http://purl.org/rss/1.0/modules/content/",
+        NSAtom:    "http://www.w3.org/2005/Atom",
+    }
 
-    c.String(http.StatusOK, xmlContent)
+    rss.Channel.Title = "Doniai技术社区"
+    rss.Channel.Link = currentDomain
+    rss.Channel.Description = "技术社区最新帖子"
+    rss.Channel.Language = "zh-CN"
+    rss.Channel.LastBuildDate = time.Now().Format(time.RFC1123Z)
+
+    // 添加帖子项目
+    for _, post := range posts {
+        postLink := currentDomain + "/post-" + fmt.Sprintf("%d", post.ID) + "-1"
+        rss.Channel.Items = append(rss.Channel.Items, RSSItem{
+            Title:       post.Title,
+            Link:        postLink,
+            Description: fmt.Sprintf("<![CDATA[%s]]>", post.Content),
+            PubDate:     post.CreatedAt,
+            GUID:        postLink,
+        })
+    }
+
+    c.XML(http.StatusOK, rss)
 }
+
 
 
